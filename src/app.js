@@ -173,5 +173,5 @@ export async function createApp() {
     res.status(500).json({ message: "Internal server error." });
   });
 
-  return { app, port: env.port };
+  return { app };
 }

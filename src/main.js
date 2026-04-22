@@ -1,7 +1,8 @@
 import { createApp } from "./app.js";
 
-const { app, port } = await createApp();
+const { app } = await createApp();
+const PORT = process.env.PORT || 3000;
 
-app.listen(port, () => {
-  console.log(`Server running at http://localhost:${port}`);
+app.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
 });
