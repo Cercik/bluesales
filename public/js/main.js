@@ -1540,6 +1540,7 @@ let workerDniLookupManualMode = false;
           response = candidate;
           payload = await candidate.json().catch(() => ({}));
           if (candidate.ok) break;
+          if (candidate.status >= 500) break;
         }
         if (seq !== workerDniLookupSeq) return false;
         if (!response || !response.ok) {
