@@ -340,9 +340,11 @@ let workerDniLookupManualMode = false;
     }
 
     async function loadData() {
+      if (!state.session?.token) return null;
       const response = await fetch(`${API_BASE}/state`, {
         headers: state.session?.token ? { Authorization: "Bearer " + state.session.token } : {}
       });
+      if (response.status === 401) return null;
       if (!response.ok) throw new Error(`HTTP ${response.status}`);
       const payload = await response.json();
       if (payload?.data && payload.data.settings && payload.data.orders && payload.data.notices) {
@@ -1781,7 +1783,8 @@ let workerDniLookupManualMode = false;
     });
     async function initializeApp() {
       try {
-        state.data = ensureStateDefaults(await loadData());
+        const loadedData = await loadData();
+        state.data = ensureStateDefaults(loadedData || buildDefaultState());
       } catch (error) {
         console.warn("No se pudo cargar estado inicial desde API.", error);
         showToast("No se pudo conectar con la base de datos.", "error");
