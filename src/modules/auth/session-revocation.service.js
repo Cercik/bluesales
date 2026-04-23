@@ -14,7 +14,7 @@ function parseNonNegativeNumber(value, fallback) {
 }
 const NEGATIVE_CACHE_TTL_MS = parseNonNegativeNumber(
   process.env.SESSION_REVOCATION_NEGATIVE_CACHE_TTL_MS,
-  env.nodeEnv === "production" ? 5_000 : 30_000
+  env.nodeEnv === "production" ? 30_000 : 30_000
 );
 
 function nowMs() {

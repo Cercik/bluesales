@@ -21,7 +21,7 @@ let lastStateSyncMs = 0;
 const STATE_CACHE_TTL_MS = (() => {
   const raw = Number(process.env.STATE_CACHE_TTL_MS);
   if (Number.isFinite(raw) && raw >= 0) return raw;
-  return env.nodeEnv === "production" ? 10_000 : 1_000;
+  return env.nodeEnv === "production" ? 60_000 : 1_000;
 })();
 
 function assertPersistentStorageAvailable() {
