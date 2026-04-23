@@ -98,6 +98,18 @@ const corsAllowNoOrigin = parseBoolean(process.env.CORS_ALLOW_NO_ORIGIN, true);
 const superAdminUser = validateSuperAdminUser(process.env.SUPER_ADMIN_USER);
 const superAdminPassword = validateSuperAdminPassword(process.env.SUPER_ADMIN_PASSWORD);
 const superAdminName = String(process.env.SUPER_ADMIN_NAME || "Super Administrador").trim() || "Super Administrador";
+const dniApiUrlTemplate = String(process.env.SUNAT_DNI_API_URL_TEMPLATE || "").trim();
+const dniApiToken = String(process.env.SUNAT_DNI_API_TOKEN || "").trim();
+const dniApiKey = String(process.env.SUNAT_DNI_API_KEY || "").trim();
+const hasDniProviderConfig = Boolean(dniApiUrlTemplate) && (
+  Boolean(dniApiToken)
+  || Boolean(dniApiKey)
+  || /([?&])token=/.test(dniApiUrlTemplate)
+);
+const dniValidationEnabled = parseBoolean(
+  process.env.SUNAT_DNI_VALIDATION_ENABLED,
+  nodeEnv === "production" && hasDniProviderConfig
+);
 
 if (nodeEnv === "production" && corsAllowedOrigins.length === 0) {
   throw new Error("[startup] En produccion debes definir CORS_ALLOWED_ORIGINS con una whitelist explicita.");
@@ -143,11 +155,11 @@ export const env = {
     measurementId: String(process.env.FIREBASE_MEASUREMENT_ID || "").trim()
   },
   dniValidation: {
-    enabled: parseBoolean(process.env.SUNAT_DNI_VALIDATION_ENABLED, false),
-    apiUrlTemplate: String(process.env.SUNAT_DNI_API_URL_TEMPLATE || "").trim(),
-    apiToken: String(process.env.SUNAT_DNI_API_TOKEN || "").trim(),
+    enabled: dniValidationEnabled,
+    apiUrlTemplate: dniApiUrlTemplate,
+    apiToken: dniApiToken,
     apiAuthScheme: String(process.env.SUNAT_DNI_API_AUTH_SCHEME || "Bearer").trim(),
-    apiKey: String(process.env.SUNAT_DNI_API_KEY || "").trim(),
+    apiKey: dniApiKey,
     apiKeyHeader: String(process.env.SUNAT_DNI_API_KEY_HEADER || "x-api-key").trim(),
     timeoutMs: parseNumber(process.env.SUNAT_DNI_TIMEOUT_MS, 8000),
     strictNameMatch: parseBoolean(process.env.SUNAT_DNI_STRICT_NAME_MATCH, true)
