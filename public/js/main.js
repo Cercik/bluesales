@@ -1,8 +1,8 @@
-﻿const API_BASE = "/api";
+const API_BASE = "/api";
 const SESSION_KEY = "bluesales_session_v3";
 
 const STATUS_LABELS = {
-  pending_confirm: "Pendiente confirmacion",
+  pending_confirm: "Pendiente confirmación",
   price_published: "Precio publicado",
   requested: "Solicitado",
   approved: "Aprobado",
@@ -243,8 +243,8 @@ let workerDniLookupManualMode = false;
             }
           },
           notificationTemplates: {
-            whatsapp: "BlueSales: tu pedido {{orderId}} ahora esta en estado {{status}}. Entrega estimada: {{deliveryDate}}.",
-            email: "BlueSales: tu pedido {{orderId}} ahora esta en estado {{status}}. Entrega estimada: {{deliveryDate}}."
+            whatsapp: "BlueSales: tu pedido {{orderId}} ahora está en estado {{status}}. Entrega estimada: {{deliveryDate}}.",
+            email: "BlueSales: tu pedido {{orderId}} ahora está en estado {{status}}. Entrega estimada: {{deliveryDate}}."
           }
         },
         notices: [
@@ -320,8 +320,8 @@ let workerDniLookupManualMode = false;
       }
       if (!data.settings.notificationTemplates) {
         data.settings.notificationTemplates = {
-          whatsapp: "BlueSales: tu pedido {{orderId}} ahora esta en estado {{status}}. Entrega estimada: {{deliveryDate}}.",
-          email: "BlueSales: tu pedido {{orderId}} ahora esta en estado {{status}}. Entrega estimada: {{deliveryDate}}."
+          whatsapp: "BlueSales: tu pedido {{orderId}} ahora está en estado {{status}}. Entrega estimada: {{deliveryDate}}.",
+          email: "BlueSales: tu pedido {{orderId}} ahora está en estado {{status}}. Entrega estimada: {{deliveryDate}}."
         };
       }
       if (!Array.isArray(data.users)) data.users = [];
@@ -350,7 +350,7 @@ let workerDniLookupManualMode = false;
       if (payload?.data && payload.data.settings && payload.data.orders && payload.data.notices) {
         return payload.data;
       }
-      throw new Error("Respuesta invalida del servidor.");
+      throw new Error("Respuesta inválida del servidor.");
     }
 
     function saveData() {
@@ -366,7 +366,7 @@ let workerDniLookupManualMode = false;
           const payload = await response.json().catch(() => ({}));
           if (payload?.storage === "memory" && !state.warnedMemoryStorage) {
             state.warnedMemoryStorage = true;
-            showToast("Firebase no esta configurado. Los cambios se guardan solo en memoria.", "error", 4200);
+            showToast("Firebase no está configurado. Los cambios se guardan solo en memoria.", "error", 4200);
           }
           if (payload?.storage === "firestore" && state.warnedMemoryStorage) {
             state.warnedMemoryStorage = false;
@@ -495,7 +495,7 @@ let workerDniLookupManualMode = false;
       const profileMenu = document.getElementById("profileMenu");
       const profileTrigger = document.getElementById("profileTrigger");
       if (!state.session) {
-        info.textContent = "No has iniciado sesion.";
+        info.textContent = "No has iniciado sesión.";
         if (authToggleGroup) authToggleGroup.classList.remove("hidden");
         if (profileMenu) profileMenu.classList.add("hidden");
         closeProfileDropdown();
@@ -503,9 +503,9 @@ let workerDniLookupManualMode = false;
       }
       if (isAdminRole(state.session.role)) {
         const title = state.session.role === "super_admin" ? "Super Administrador" : "Administrador";
-        info.textContent = "Sesion: " + title + " (" + (state.session.username || state.session.id || "-") + ")";
+        info.textContent = "Sesión: " + title + " (" + (state.session.username || state.session.id || "-") + ")";
       } else {
-        info.textContent = "Sesion: " + state.session.name + " (" + state.session.id + ")";
+        info.textContent = "Sesión: " + state.session.name + " (" + state.session.id + ")";
       }
       if (authToggleGroup) authToggleGroup.classList.add("hidden");
       if (profileMenu) profileMenu.classList.remove("hidden");
@@ -703,7 +703,7 @@ let workerDniLookupManualMode = false;
         const blob = await response.blob();
         const disposition = response.headers.get("content-disposition") || "";
         const match = disposition.match(/filename=\"?([^\";]+)\"?/i);
-        const fileName = match?.[1] || ("formato_venta_arandano_" + todayISO() + ".xlsx");
+        const fileName = match?.[1] || ("formato_venta_arándano_" + todayISO() + ".xlsx");
         const url = URL.createObjectURL(blob);
         const link = document.createElement("a");
         link.href = url;
@@ -734,7 +734,7 @@ let workerDniLookupManualMode = false;
       });
       if (!response.ok) {
         const error = await response.json().catch(() => ({}));
-        throw new Error(error.message || "No se pudo iniciar sesion.");
+        throw new Error(error.message || "No se pudo iniciar sesión.");
       }
       return response.json();
     }
@@ -744,7 +744,7 @@ let workerDniLookupManualMode = false;
         const response = await fetch(`${API_BASE}/auth/me`, {
           headers: { Authorization: "Bearer " + state.session.token }
         });
-        if (!response.ok) throw new Error("Sesion invalida");
+        if (!response.ok) throw new Error("Sesión inválida");
         const payload = await response.json().catch(() => ({}));
         if (payload?.profile && typeof payload.profile === "object") {
           saveSession({
@@ -755,7 +755,7 @@ let workerDniLookupManualMode = false;
         }
       } catch {
         saveSession(null);
-        showToast("La sesion expiro. Inicia sesion nuevamente.", "error");
+        showToast("La sesión expiró. Inicia sesión nuevamente.", "error");
       }
     }
 
@@ -810,10 +810,10 @@ let workerDniLookupManualMode = false;
       const password = document.getElementById("newAdminPassword")?.value || "";
 
       if (!username || !name || !password) {
-        return showToast("Completa usuario, nombre y contrasena.", "error");
+        return showToast("Completa usuario, nombre y contraseña.", "error");
       }
       if (password.length < 8) {
-        return showToast("La contrasena debe tener al menos 8 caracteres.", "error");
+        return showToast("La contraseña debe tener al menos 8 caracteres.", "error");
       }
 
       try {
@@ -859,12 +859,12 @@ let workerDniLookupManualMode = false;
       document.getElementById("workerMetrics").innerHTML =
         "<div class='metric'><span class='subtle'>Kg usados esta semana</span><strong>" + used.toFixed(2) + " Kg</strong></div>" +
         "<div class='metric'><span class='subtle'>Kg disponibles para ti</span><strong>" + left.toFixed(2) + " Kg</strong></div>" +
-        "<div class='metric'><span class='subtle'>Kg acumulados en el anio</span><strong>" + yearly.toFixed(2) + " Kg</strong></div>";
+        "<div class='metric'><span class='subtle'>Kg acumulados en el año</span><strong>" + yearly.toFixed(2) + " Kg</strong></div>";
       document.getElementById("orderWindowAlert").textContent = isOrderWindowOpen()
         ? (published
           ? ("Precio publicado. Confirma tus solicitudes antes del lunes a las 23:59. " + deadlineText).trim()
-          : "Precio no publicado aun. Se habilita cuando administracion lo publique y luego debes confirmar o cancelar tu compra.")
-        : "Ventas cerradas (martes). Reapertura: miercoles 00:00.";
+          : "Precio no publicado aún. Se habilita cuando administración lo publique y luego debes confirmar o cancelar tu compra.")
+        : "Ventas cerradas (martes). Reapertura: miércoles 00:00.";
 
       const notices = getVisibleNotices();
       const reads = state.data.noticeReads[state.session.id] || [];
@@ -894,7 +894,7 @@ let workerDniLookupManualMode = false;
           : (["pending_confirm", "price_published"].includes(o.status)
             ? (!pendingDeadlineOpen
               ? "<span class='subtle'>Plazo vencido</span>"
-              : "<span class='subtle'>Esperando accion</span>")
+              : "<span class='subtle'>Esperando acción</span>")
             : "-");
         const orderCycleKey = getOrderCycleKey(o);
         const showPublishedPrice = o.status === "price_published";
@@ -905,7 +905,7 @@ let workerDniLookupManualMode = false;
         const priceCell = priceToShow === null ? "-" : ("S/ " + priceToShow.toFixed(2));
         const totalCell = totalToShow === null ? "-" : ("S/ " + totalToShow.toFixed(2));
         return "<tr><td>" + formatDateTime(o.createdAt) + "</td><td>Semana " + getOrderClosingWeek(o) + "</td><td>" + numeric(o.kg).toFixed(2) + "</td><td>" + priceCell + "</td><td>" + totalCell + "</td><td>" + formatDate(o.deliveryDate) + "</td><td><span class='status " + o.status + "'>" + STATUS_LABELS[o.status] + "</span></td><td>" + action + "</td></tr>";
-      }).join("") : "<tr><td colspan='8' class='subtle'>Aun no tienes compras registradas.</td></tr>";
+      }).join("") : "<tr><td colspan='8' class='subtle'>Aún no tienes compras registradas.</td></tr>";
       tbody.querySelectorAll("select[data-worker-action]").forEach((select) => select.addEventListener("change", () => {
         if (!select.value) return;
         if (select.value === "confirm") return confirmOrder(select.dataset.workerAction);
@@ -936,7 +936,7 @@ let workerDniLookupManualMode = false;
       document.getElementById("cfgNationalPrice").value = getPricePerKg(currentCycle);
       document.getElementById("pricePublishInfo").textContent = isPricePublished(currentCycle)
         ? "Precio publicado para la semana actual."
-        : "Precio aun no publicado para la semana actual.";
+        : "Precio aún no publicado para la semana actual.";
       document.getElementById("tplWhatsapp").value = state.data.settings.notificationTemplates?.whatsapp || "";
       document.getElementById("tplEmail").value = state.data.settings.notificationTemplates?.email || "";
       renderPriceAdmin();
@@ -1139,7 +1139,7 @@ let workerDniLookupManualMode = false;
             "<td class='nowrap'>" + (u.createdAt ? formatDateTime(u.createdAt) : "-") + "</td>" +
             "<td class='table-actions'>" +
             "<button class='icon-action icon-save' data-worker-save='" + escapeHtml(u.id) + "' type='button' title='Guardar cambios' aria-label='Guardar cambios'><span aria-hidden='true'>💾</span></button>" +
-            "<button class='icon-action icon-pass' data-worker-pass='" + escapeHtml(u.id) + "' type='button' title='Cambiar contrasena' aria-label='Cambiar contrasena'><span aria-hidden='true'>🔐</span></button>" +
+            "<button class='icon-action icon-pass' data-worker-pass='" + escapeHtml(u.id) + "' type='button' title='Cambiar contraseña' aria-label='Cambiar contraseña'><span aria-hidden='true'>🔐</span></button>" +
             "<button class='icon-action " + (isActive ? "icon-disable" : "icon-enable") + "' data-worker-toggle='" + escapeHtml(u.id) + "' type='button' title='" + (isActive ? "Inhabilitar trabajador" : "Habilitar trabajador") + "' aria-label='" + (isActive ? "Inhabilitar trabajador" : "Habilitar trabajador") + "'><span aria-hidden='true'>" + (isActive ? "⛔" : "✅") + "</span></button>" +
             "<button class='icon-action icon-delete' data-worker-del='" + escapeHtml(u.id) + "' type='button' title='Eliminar trabajador' aria-label='Eliminar trabajador'><span aria-hidden='true'>🗑</span></button>" +
             "</td>" +
@@ -1156,8 +1156,8 @@ let workerDniLookupManualMode = false;
           const phone = body.querySelector("input[data-worker-phone='" + id + "']").value.trim();
           const email = body.querySelector("input[data-worker-email='" + id + "']").value.trim();
           if (!name) return showToast("El nombre no puede estar vacio.", "error");
-          if (phone && !isValidPhone(phone)) return showToast("Celular invalido. Usa 9 a 12 digitos.", "error");
-          if (email && !isValidEmail(email)) return showToast("Correo invalido.", "error");
+          if (phone && !isValidPhone(phone)) return showToast("Celular inválido. Usa 9 a 12 digitos.", "error");
+          if (email && !isValidEmail(email)) return showToast("Correo inválido.", "error");
           worker.name = name;
           worker.phone = normalizePhone(phone);
           worker.email = email;
@@ -1172,12 +1172,12 @@ let workerDniLookupManualMode = false;
           const id = btn.dataset.workerPass;
           const worker = state.data.users.find((u) => u.id === id);
           if (!worker) return;
-          const newPass = prompt("Nueva contrasena para DNI " + id + ":", "");
+          const newPass = prompt("Nueva contraseña para DNI " + id + ":", "");
           if (newPass === null) return;
-          if (newPass.trim().length < 8) return showToast("La contrasena debe tener al menos 8 caracteres.", "error");
+          if (newPass.trim().length < 8) return showToast("La contraseña debe tener al menos 8 caracteres.", "error");
           worker.password = newPass.trim();
           saveData();
-          showToast("Contrasena actualizada correctamente.", "success");
+          showToast("Contraseña actualizada correctamente.", "success");
           renderAll();
         });
       });
@@ -1190,8 +1190,8 @@ let workerDniLookupManualMode = false;
           const willEnable = worker.active === false;
           const ok = confirm(
             willEnable
-              ? ("Se habilitara el acceso para DNI " + id + ". Deseas continuar?")
-              : ("Se inhabilitara el acceso para DNI " + id + ". El trabajador ya no podra iniciar sesion. Deseas continuar?")
+              ? ("Se habilitará el acceso para DNI " + id + ". ¿Deseas continuar?")
+              : ("Se inhabilitará el acceso para DNI " + id + ". El trabajador ya no podrá iniciar sesión. ¿Deseas continuar?")
           );
           if (!ok) return;
           worker.active = willEnable;
@@ -1206,7 +1206,7 @@ let workerDniLookupManualMode = false;
           const id = btn.dataset.workerDel;
           const hasOrders = state.data.orders.some((o) => o.workerId === id);
           if (hasOrders) {
-            const ok = confirm("Este trabajador tiene pedidos registrados. Deseas eliminar solo el acceso?");
+            const ok = confirm("Este trabajador tiene pedidos registrados. ¿Deseas eliminar solo el acceso?");
             if (!ok) return;
           }
           state.data.users = state.data.users.filter((u) => u.id !== id);
@@ -1228,7 +1228,7 @@ let workerDniLookupManualMode = false;
     function openNoticeModal(notice) {
       if (!notice) return;
       document.getElementById("modalTitle").textContent = notice.title;
-      document.getElementById("modalMeta").textContent = "Area: " + (notice.area || "General") + " | Publicado: " + notice.publishDate;
+      document.getElementById("modalMeta").textContent = "Área: " + (notice.area || "General") + " | Publicado: " + notice.publishDate;
       document.getElementById("modalText").textContent = notice.content;
       const actions = document.getElementById("modalActions");
       actions.innerHTML = "";
@@ -1248,12 +1248,12 @@ let workerDniLookupManualMode = false;
     }
 
     async function createOrder() {
-      if (!isOrderWindowOpen()) return showToast("Ventas cerradas (martes). Reapertura: miercoles 00:00.", "error");
+      if (!isOrderWindowOpen()) return showToast("Ventas cerradas (martes). Reapertura: miércoles 00:00.", "error");
       const kg = numeric(document.getElementById("orderKg").value);
       if (!kg || kg <= 0) return showToast("Ingresa cantidad valida.", "error");
-      if (kg > 2) return showToast("Maximo 2 Kg por persona.", "error");
+      if (kg > 2) return showToast("Máximo 2 Kg por persona.", "error");
       const used = getWorkerWeeklyKg(state.session.id);
-      if (used + kg > 2) return showToast("Superas limite semanal. Te quedan " + Math.max(0, 2 - used).toFixed(2) + " Kg.", "error");
+      if (used + kg > 2) return showToast("Superas límite semanal. Te quedan " + Math.max(0, 2 - used).toFixed(2) + " Kg.", "error");
       try {
         const response = await fetch(`${API_BASE}/worker/orders`, {
           method: "POST",
@@ -1273,7 +1273,7 @@ let workerDniLookupManualMode = false;
     async function confirmOrder(orderId) {
       const order = state.data.orders.find((o) => o.id === orderId && o.workerId === state.session.id);
       if (!order) return;
-      if (order.status !== "price_published") return showToast("Aun no hay precio publicado para confirmar esta compra.", "error");
+      if (order.status !== "price_published") return showToast("Aún no hay precio publicado para confirmar esta compra.", "error");
       try {
         const response = await fetch(`${API_BASE}/worker/orders/${encodeURIComponent(orderId)}/confirm`, {
           method: "POST",
@@ -1376,7 +1376,7 @@ let workerDniLookupManualMode = false;
       const entry = getWeeklyPriceEntry(cycleKey);
       const hasConfiguredPrice = numeric(entry.pricePerKg) > 0 || Boolean(entry.published);
       if (!hasConfiguredPrice) return showToast("No hay precio configurado para esa semana.", "info");
-      const ok = confirm("Se borrara el precio de la semana " + cycleKey + ". Esta accion no afecta pedidos ya confirmados. Deseas continuar?");
+      const ok = confirm("Se borrará el precio de la semana " + cycleKey + ". Esta acción no afecta pedidos ya confirmados. ¿Deseas continuar?");
       if (!ok) return;
       delete state.data.settings.weeklyPrices[cycleKey];
       syncPricePublishedStatuses();
@@ -1417,7 +1417,7 @@ let workerDniLookupManualMode = false;
     }
     function startNoticeEdit(noticeId) {
       const notice = state.data.notices.find((n) => n.id === noticeId);
-      if (!notice) return showToast("No se encontro el comunicado a editar.", "error");
+      if (!notice) return showToast("No se encontró el comunicado a editar.", "error");
       state.editingNoticeId = notice.id;
       setAdminView("new_notice");
       document.getElementById("noticeTitle").value = notice.title || "";
@@ -1433,7 +1433,7 @@ let workerDniLookupManualMode = false;
       state.editingNoticeId = null;
       clearNoticeFormFields();
       updateNoticeFormMode();
-      if (showMessage && wasEditing) showToast("Edicion cancelada.", "info");
+      if (showMessage && wasEditing) showToast("Edición cancelada.", "info");
     }
 
     function createNotice() {
@@ -1442,12 +1442,12 @@ let workerDniLookupManualMode = false;
       const area = document.getElementById("noticeArea").value.trim();
       const publishDate = document.getElementById("noticeDate").value;
       const content = document.getElementById("noticeContent").value.trim();
-      if (!title || !summary || !publishDate || !content) return showToast("Completa titulo, resumen, fecha y contenido.", "error");
+      if (!title || !summary || !publishDate || !content) return showToast("Completa título, resumen, fecha y contenido.", "error");
       if (state.editingNoticeId) {
         const notice = state.data.notices.find((n) => n.id === state.editingNoticeId);
         if (!notice) {
           cancelNoticeEdit(false);
-          return showToast("No se encontro el comunicado a editar.", "error");
+          return showToast("No se encontró el comunicado a editar.", "error");
         }
         notice.title = title;
         notice.summary = summary;
@@ -1520,7 +1520,7 @@ let workerDniLookupManualMode = false;
     function enableWorkerNameManualMode() {
       workerDniLookupManualMode = true;
       setWorkerNameReadOnly(false);
-      setWorkerNameHint("Validacion DNI no disponible. Escribe tu nombre completo manualmente.");
+      setWorkerNameHint("Validación DNI no disponible. Escribe tu nombre completo manualmente.");
     }
 
     async function lookupWorkerNameByDni(dni, options = {}) {
@@ -1556,11 +1556,11 @@ let workerDniLookupManualMode = false;
           const message = String(payload?.message || ("No se pudo consultar el DNI." + statusText)).trim();
           const statusCode = Number(response?.status || 0);
           const isServiceUnavailable = statusCode >= 500
-            || /validacion de dni no esta habilitada/i.test(message)
-            || /no se pudo conectar al servicio de validacion/i.test(message);
+            || /validaci[oó]n de dni no est[aá] habilitada/i.test(message)
+            || /no se pudo conectar al servicio de validaci[oó]n/i.test(message);
           if (isServiceUnavailable) {
             enableWorkerNameManualMode();
-            if (!silent) showToast("Validacion DNI no disponible. Ingresa tu nombre manualmente.", "info", 4500);
+            if (!silent) showToast("Validación DNI no disponible. Ingresa tu nombre manualmente.", "info", 4500);
             return Boolean(nameInput.value.trim());
           }
           nameInput.value = "";
@@ -1576,8 +1576,8 @@ let workerDniLookupManualMode = false;
         const composedName = [nombres, apellidoPaterno, apellidoMaterno].filter(Boolean).join(" ").trim();
         const name = composedName || String(payload?.name || "").trim();
         nameInput.value = name;
-        setWorkerNameHint(name ? "" : "No se encontro nombre para ese DNI.", !name);
-        if (!name && !silent) showToast("No se encontro nombre para ese DNI.", "error");
+        setWorkerNameHint(name ? "" : "No se encontró nombre para ese DNI.", !name);
+        if (!name && !silent) showToast("No se encontró nombre para ese DNI.", "error");
         return Boolean(name);
       } catch (_error) {
         if (seq !== workerDniLookupSeq) return false;
@@ -1590,8 +1590,8 @@ let workerDniLookupManualMode = false;
     async function workerLogin() {
       const dni = document.getElementById("workerDniLogin").value.trim();
       const password = document.getElementById("workerPasswordLogin").value;
-      if (!dni || !password) return showToast("Ingresa DNI y contrasena.", "error");
-      if (!isValidDni(dni)) return showToast("El DNI debe tener 8 digitos numericos.", "error");
+      if (!dni || !password) return showToast("Ingresa DNI y contraseña.", "error");
+      if (!isValidDni(dni)) return showToast("El DNI debe tener 8 digitos numéricos.", "error");
       try {
         const auth = await loginWithApi({ role: "worker", id: dni, password });
         saveSession({ ...auth.profile, token: auth.token });
@@ -1601,7 +1601,7 @@ let workerDniLookupManualMode = false;
         document.getElementById("workerRegisterBox").classList.remove("hidden");
         document.getElementById("workerDniRegister").value = dni;
         if (isValidDni(dni)) lookupWorkerNameByDni(dni, { silent: true });
-        showToast(error.message || "No se pudo iniciar sesion.", "error");
+        showToast(error.message || "No se pudo iniciar sesión.", "error");
       }
     }
 
@@ -1614,13 +1614,13 @@ let workerDniLookupManualMode = false;
       const password = document.getElementById("workerPasswordRegister").value;
 
       if (!dni || !phone || !email || !password) {
-        return showToast("Completa DNI, celular, correo y contrasena.", "error");
+        return showToast("Completa DNI, celular, correo y contraseña.", "error");
       }
-      if (!isValidDni(dni)) return showToast("El DNI debe tener 8 digitos numericos.", "error");
-      if (password.length < 8) return showToast("La contrasena debe tener al menos 8 caracteres.", "error");
-      if (!isValidPhone(phone)) return showToast("Celular invalido. Usa 9 a 12 digitos.", "error");
-      if (!isValidEmail(email)) return showToast("Correo invalido.", "error");
-      if (state.data.users.some((u) => u.id === dni)) return showToast("Ese DNI ya esta registrado. Inicia sesion.", "error");
+      if (!isValidDni(dni)) return showToast("El DNI debe tener 8 digitos numéricos.", "error");
+      if (password.length < 8) return showToast("La contraseña debe tener al menos 8 caracteres.", "error");
+      if (!isValidPhone(phone)) return showToast("Celular inválido. Usa 9 a 12 digitos.", "error");
+      if (!isValidEmail(email)) return showToast("Correo inválido.", "error");
+      if (state.data.users.some((u) => u.id === dni)) return showToast("Ese DNI ya está registrado. Inicia sesión.", "error");
       if (!name) {
         const ok = await lookupWorkerNameByDni(dni);
         name = nameInput.value.trim();
@@ -1666,9 +1666,9 @@ let workerDniLookupManualMode = false;
           state.adminUsers = [];
         }
         renderAll();
-        showToast(auth.profile?.role === "super_admin" ? "Sesion super admin iniciada." : "Sesion admin iniciada.", "success");
+        showToast(auth.profile?.role === "super_admin" ? "Sesión super admin iniciada." : "Sesión admin iniciada.", "success");
       } catch (error) {
-        showToast(error.message || "Credenciales invalidas.", "error");
+        showToast(error.message || "Credenciales inválidas.", "error");
       }
     }
 
@@ -1686,7 +1686,7 @@ let workerDniLookupManualMode = false;
       }
       saveSession(null);
       renderAll();
-      showToast("Sesion cerrada.", "info");
+      showToast("Sesión cerrada.", "info");
     }
     function submitLoginOnEnter(e) {
       if (e.key !== "Enter") return;
@@ -1709,7 +1709,7 @@ let workerDniLookupManualMode = false;
         workerDniLookupSeq++;
         if (nameInput) nameInput.value = "";
         setWorkerNameHint(workerDniLookupManualMode
-          ? "Validacion DNI no disponible. Escribe tu nombre completo manualmente."
+          ? "Validación DNI no disponible. Escribe tu nombre completo manualmente."
           : "Ingresa tu DNI para consultar el nombre oficial.");
         return;
       }
@@ -1807,6 +1807,8 @@ let workerDniLookupManualMode = false;
     }
 
     initializeApp();
+
+
 
 
 

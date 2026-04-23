@@ -3,7 +3,7 @@ import path from "node:path";
 import ExcelJS from "exceljs";
 
 const STATUS_LABELS = {
-  pending_confirm: "Pendiente confirmacion",
+  pending_confirm: "Pendiente confirmación",
   price_published: "Precio publicado",
   requested: "Solicitado",
   approved: "Aprobado",

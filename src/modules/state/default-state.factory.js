@@ -20,8 +20,8 @@ export function buildDefaultState() {
         }
       },
       notificationTemplates: {
-        whatsapp: "BlueSales: tu pedido {{orderId}} ahora esta en estado {{status}}. Entrega estimada: {{deliveryDate}}.",
-        email: "BlueSales: tu pedido {{orderId}} ahora esta en estado {{status}}. Entrega estimada: {{deliveryDate}}."
+        whatsapp: "BlueSales: tu pedido {{orderId}} ahora está en estado {{status}}. Entrega estimada: {{deliveryDate}}.",
+        email: "BlueSales: tu pedido {{orderId}} ahora está en estado {{status}}. Entrega estimada: {{deliveryDate}}."
       }
     },
     notices: [

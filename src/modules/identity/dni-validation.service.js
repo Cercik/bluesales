@@ -159,19 +159,19 @@ export async function validateWorkerIdentity({ dni, fullName }) {
 
 export async function lookupDniIdentity(dni) {
   if (!isEnabled()) {
-    return { ok: false, status: 503, message: "La validacion de DNI no esta habilitada." };
+    return { ok: false, status: 503, message: "La validación de DNI no está habilitada." };
   }
 
   const url = buildUrl(dni);
   if (!url) {
-    return { ok: false, status: 500, message: "Validacion DNI activa, pero falta SUNAT_DNI_API_URL_TEMPLATE." };
+    return { ok: false, status: 500, message: "Validación DNI activa, pero falta SUNAT_DNI_API_URL_TEMPLATE." };
   }
 
   let response;
   try {
     response = await fetchWithTimeout(url, { method: "GET", headers: buildHeaders() }, env.dniValidation.timeoutMs);
   } catch {
-    return { ok: false, status: 503, message: "No se pudo conectar al servicio de validacion DNI." };
+    return { ok: false, status: 503, message: "No se pudo conectar al servicio de validación DNI." };
   }
 
   let payload = null;
@@ -192,14 +192,14 @@ export async function lookupDniIdentity(dni) {
 
   const officialDni = extractDocumentNumber(payload);
   if (officialDni && String(officialDni).trim() !== String(dni).trim()) {
-    return { ok: false, status: 422, message: "El DNI consultado no coincide con la respuesta de validacion." };
+    return { ok: false, status: 422, message: "El DNI consultado no coincide con la respuesta de validación." };
   }
 
   const nameParts = extractNameParts(payload);
   const fullNameFromParts = [nameParts.nombres, nameParts.apellidoPaterno, nameParts.apellidoMaterno].filter(Boolean).join(" ").trim();
   const officialName = fullNameFromParts || extractOfficialName(payload);
   if (!officialName) {
-    return { ok: false, status: 503, message: "El servicio de validacion no devolvio nombre del DNI consultado." };
+    return { ok: false, status: 503, message: "El servicio de validación no devolvió nombre del DNI consultado." };
   }
 
   return {

@@ -77,7 +77,7 @@ async function fetchRevokedSessionFromStore(sessionId, now) {
     revokedSessions.set(sessionId, expiresAt);
     return true;
   } catch (error) {
-    console.warn("[security] No se pudo consultar revocacion de sesion en Firestore.", serializeError(error));
+    console.warn("[security] No se pudo consultar revocacion de sesión en Firestore.", serializeError(error));
     return false;
   }
 }
@@ -185,7 +185,7 @@ export async function revokeSession(sessionId, expiresAt, meta = {}) {
         id: String(meta?.id || "").trim()
       });
     } catch (error) {
-      console.warn("[security] No se pudo persistir revocacion de sesion en Firestore.", serializeError(error));
+      console.warn("[security] No se pudo persistir revocacion de sesión en Firestore.", serializeError(error));
     }
   }
 
@@ -229,3 +229,4 @@ export async function revokePrincipalSessions({ role, id, expiresAt, reason = ""
   }
   return revokedCount;
 }
+

@@ -55,7 +55,7 @@ function validateTokenSecret(rawValue) {
 function validateAdminPin(rawValue) {
   const pin = String(rawValue || "").trim();
   if (!/^\d{6,}$/.test(pin)) {
-    throw new Error("[startup] ADMIN_PIN debe tener al menos 6 digitos numericos.");
+    throw new Error("[startup] ADMIN_PIN debe tener al menos 6 digitos numéricos.");
   }
   if (/^(\d)\1+$/.test(pin)) {
     throw new Error("[startup] ADMIN_PIN no puede repetir un mismo digito.");
@@ -82,7 +82,7 @@ function validateSuperAdminUser(rawValue) {
   const user = String(rawValue || "").trim();
   if (!user) return "";
   if (user.length < 3 || user.length > 80) {
-    throw new Error("[startup] SUPER_ADMIN_USER invalido. Debe tener entre 3 y 80 caracteres.");
+    throw new Error("[startup] SUPER_ADMIN_USER inválido. Debe tener entre 3 y 80 caracteres.");
   }
   return user;
 }
@@ -91,7 +91,7 @@ function validateSuperAdminPassword(rawValue) {
   const password = String(rawValue || "");
   if (!password) return "";
   if (password.length < 8 || password.length > 128) {
-    throw new Error("[startup] SUPER_ADMIN_PASSWORD invalido. Debe tener entre 8 y 128 caracteres.");
+    throw new Error("[startup] SUPER_ADMIN_PASSWORD inválido. Debe tener entre 8 y 128 caracteres.");
   }
   return password;
 }
@@ -116,15 +116,15 @@ const dniValidationEnabled = nodeEnv === "production"
   : parseBoolean(process.env.SUNAT_DNI_VALIDATION_ENABLED, false);
 
 if (nodeEnv === "production" && corsAllowedOrigins.length === 0) {
-  throw new Error("[startup] En produccion debes definir CORS_ALLOWED_ORIGINS con una whitelist explicita.");
+  throw new Error("[startup] En producción debes definir CORS_ALLOWED_ORIGINS con una whitelist explicita.");
 }
 
 if (nodeEnv === "production" && corsAllowNoOrigin) {
-  throw new Error("[startup] CORS_ALLOW_NO_ORIGIN debe ser false en produccion.");
+  throw new Error("[startup] CORS_ALLOW_NO_ORIGIN debe ser false en producción.");
 }
 
 if (nodeEnv === "production" && (!superAdminUser || !superAdminPassword)) {
-  throw new Error("[startup] En produccion debes definir SUPER_ADMIN_USER y SUPER_ADMIN_PASSWORD.");
+  throw new Error("[startup] En producción debes definir SUPER_ADMIN_USER y SUPER_ADMIN_PASSWORD.");
 }
 
 export const env = {
@@ -169,3 +169,4 @@ export const env = {
     strictNameMatch: parseBoolean(process.env.SUNAT_DNI_STRICT_NAME_MATCH, true)
   }
 };
+

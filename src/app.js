@@ -46,11 +46,11 @@ async function requireAdminToken(req, res, next) {
     const profile = verifyToken(token);
     if (!profile) {
       logSecurityEvent("session_invalid", req, { context: "legacy_admin_route" });
-      return res.status(401).json({ message: "Sesion invalida o expirada." });
+      return res.status(401).json({ message: "Sesión inválida o expirada." });
     }
     if (await isSessionRevoked(profile)) {
       logSecurityEvent("session_revoked", req, { context: "legacy_admin_route", sid: profile.sid, role: profile.role, id: profile.id });
-      return res.status(401).json({ message: "Sesion revocada." });
+      return res.status(401).json({ message: "Sesión revocada." });
     }
     if (!isPrivilegedAdminRole(profile.role)) {
       logSecurityEvent("authorization_denied", req, { context: "legacy_admin_route", role: profile.role });
@@ -166,11 +166,11 @@ export async function createApp() {
 
   app.use((error, _req, res, _next) => {
     if (String(error?.message || "").toLowerCase().includes("cors policy")) {
-      return res.status(403).json({ message: "Origen bloqueado por politica CORS." });
+      return res.status(403).json({ message: "Origen bloqueado por política CORS." });
     }
     const statusCode = Number(error?.statusCode || 0);
     if (Number.isFinite(statusCode) && statusCode >= 400 && statusCode < 500) {
-      return res.status(statusCode).json({ message: error?.message || "Solicitud invalida." });
+      return res.status(statusCode).json({ message: error?.message || "Solicitud inválida." });
     }
     console.error("[api:error]", {
       message: error?.message,
@@ -182,3 +182,4 @@ export async function createApp() {
 
   return { app };
 }
+

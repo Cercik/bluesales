@@ -12,9 +12,9 @@
     <section class="hero">
       <div class="brand">
         <img src="assets/images/logo-diamond.png" alt="Logo de Diamond" />
-        <span class="chip">modulo de ventas y comunicados</span>
+        <span class="chip">módulo de ventas y comunicados</span>
       </div>
-      <h1>Portal interno de compra de arandano para trabajadores</h1>
+      <h1>Portal interno de compra de arándano para trabajadores</h1>
       <p>
         Comunicados, solicitudes de compra, trazabilidad de pedidos y
         seguimiento semanal en una sola app.
@@ -22,19 +22,19 @@
     </section>
 
     <section class="session-row" id="sessionRow">
-      <div class="session-info" id="sessionInfo">No has iniciado sesion.</div>
+      <div class="session-info" id="sessionInfo">No has iniciado sesión.</div>
       <div class="session-actions">
         <div class="inline" id="authToggleGroup">
           <button class="button-ghost auth-toggle is-active" id="showWorkerLogin">Ingreso trabajador</button>
           <button class="button-ghost auth-toggle" id="showAdminLogin">Ingreso admin</button>
         </div>
         <div class="profile-menu hidden" id="profileMenu">
-          <button class="profile-trigger" id="profileTrigger" type="button" aria-haspopup="true" aria-expanded="false" aria-label="Abrir menu de perfil">
+          <button class="profile-trigger" id="profileTrigger" type="button" aria-haspopup="true" aria-expanded="false" aria-label="Abrir menú de perfil">
             <span aria-hidden="true">👤</span>
           </button>
           <div class="profile-dropdown hidden" id="profileDropdown" role="menu">
-            <button class="profile-option" id="profileInfoButton" type="button" role="menuitem">Informacion</button>
-            <button class="profile-option profile-option-logout" id="profileLogoutButton" type="button" role="menuitem">Cerrar sesion</button>
+            <button class="profile-option" id="profileInfoButton" type="button" role="menuitem">Información</button>
+            <button class="profile-option profile-option-logout" id="profileLogoutButton" type="button" role="menuitem">Cerrar sesión</button>
           </div>
         </div>
       </div>
@@ -43,26 +43,26 @@
     <section class="main login-panels" id="loginPanels">
       <article class="card login-card" id="workerLoginCard">
         <h2>Ingreso trabajador</h2>
-        <p class="subtle">Ingresa con tu DNI y la contrasena creada por ti.</p>
+        <p class="subtle">Ingresa con tu DNI y la contraseña creada por ti.</p>
         <div class="grid-2" style="margin-top:10px;">
             <div class="field">
               <label for="workerDniLogin">Usuario (DNI)</label>
               <input id="workerDniLogin" placeholder="Ej. 12345678" maxlength="8" inputmode="numeric" />
             </div>
           <div class="field">
-            <label for="workerPasswordLogin">Contrasena</label>
-            <input id="workerPasswordLogin" type="password" placeholder="Tu contrasena" />
+            <label for="workerPasswordLogin">Contraseña</label>
+            <input id="workerPasswordLogin" type="password" placeholder="Tu contraseña" />
           </div>
         </div>
         <div class="inline" style="margin-top:10px;">
           <button class="button" id="workerLoginButton">Ingresar como trabajador</button>
           <button class="button-ghost" id="showWorkerRegisterButton" type="button">Registrarse</button>
         </div>
-        <div class="helper" style="margin-top:8px;">Si no estas registrado, primero intenta ingresar y te mostraremos el formulario de registro.</div>
+        <div class="helper" style="margin-top:8px;">Si no estás registrado, primero intenta ingresar y te mostraremos el formulario de registro.</div>
 
         <div id="workerRegisterBox" class="hidden" style="margin-top:12px;">
           <h2 style="margin-bottom:6px;">Registro de trabajador</h2>
-          <p class="subtle">Completa tus datos para crear tu contrasena.</p>
+          <p class="subtle">Completa tus datos para crear tu contraseña.</p>
           <div class="grid-2" style="margin-top:10px;">
             <div class="field">
               <label for="workerDniRegister">DNI</label>
@@ -82,8 +82,8 @@
               <input id="workerEmail" placeholder="Ej. usuario@correo.com" />
             </div>
             <div class="field">
-              <label for="workerPasswordRegister">Crear contrasena</label>
-              <input id="workerPasswordRegister" type="password" placeholder="Minimo 4 caracteres" />
+              <label for="workerPasswordRegister">Crear contraseña</label>
+              <input id="workerPasswordRegister" type="password" placeholder="Mínimo 4 caracteres" />
             </div>
           </div>
           <div class="inline" style="margin-top:10px;">
@@ -108,13 +108,13 @@
         <div class="inline" style="margin-top:10px;">
           <button class="button" id="adminLoginButton">Ingresar como admin</button>
         </div>
-        <div class="helper" style="margin-top:8px;">Este acceso tambien aplica para super administrador.</div>
+        <div class="helper" style="margin-top:8px;">Este acceso también aplica para super administrador.</div>
       </article>
     </section>
     <section class="main hidden" id="workerApp">
       <article class="card">
         <h2>Resumen personal</h2>
-        <p class="subtle">Control semanal de limite y ventana de solicitudes.</p>
+        <p class="subtle">Control semanal de límite y ventana de solicitudes.</p>
         <div class="metrics" id="workerMetrics"></div>
         <div class="alert" id="orderWindowAlert"></div>
       </article>
@@ -127,15 +127,15 @@
         </article>
 
         <article class="card">
-          <h2>Compra de arandano</h2>
+          <h2>Compra de arándano</h2>
           <div class="product-image">
-            <img src="assets/images/blueberry-1-5kg.png" alt="Producto arandano en envase" />
+            <img src="assets/images/blueberry-1-5kg.png" alt="Producto arándano en envase" />
           </div>
           <ol class="policy-list">
-            <li>Solicitudes: miercoles a lunes (cierre de ventas el lunes).</li>
-            <li>Compra maxima: 2.00 Kg por persona por semana.</li>
-            <li>Presentacion de venta: envase de 18 oz (500 gr).</li>
-            <li>Precio unico por Kg publicado por administracion.</li>
+            <li>Solicitudes: miércoles a lunes (cierre de ventas el lunes).</li>
+            <li>Compra máxima: 2.00 Kg por persona por semana.</li>
+            <li>Presentación de venta: envase de 18 oz (500 gr).</li>
+            <li>Precio único por Kg publicado por administración.</li>
             <li>Entrega del producto: viernes de la semana siguiente.</li>
             <li>Consultas: WhatsApp 903 468 507.</li>
           </ol>
@@ -146,14 +146,14 @@
               <input id="orderKg" type="number" min="0.5" max="2" step="0.5" value="0.5" />
             </div>
             <button class="button" id="createOrderButton" type="button">Registrar solicitud</button>
-            <div class="helper" id="orderHelper">Maximo 2 Kg por persona. El precio se publica cuando administracion lo habilite y luego debes confirmar o cancelar.</div>
+            <div class="helper" id="orderHelper">Máximo 2 Kg por persona. El precio se publica cuando administración lo habilite y luego debes confirmar o cancelar.</div>
           </div>
         </article>
       </div>
 
       <article class="card">
         <h2>Mis compras</h2>
-        <p class="subtle">Estados: Pendiente confirmacion, Precio publicado, Solicitado, Aprobado, Listo para entrega, Entregado, Cancelado.</p>
+        <p class="subtle">Estados: Pendiente confirmación, Precio publicado, Solicitado, Aprobado, Listo para entrega, Entregado, Cancelado.</p>
         <div class="table-wrap">
           <table>
             <thead>
@@ -165,7 +165,7 @@
                 <th>Total</th>
                 <th>Entrega estimada</th>
                 <th>Estado</th>
-                <th>Accion</th>
+                <th>Acción</th>
               </tr>
             </thead>
             <tbody id="workerOrdersBody"></tbody>
@@ -184,14 +184,14 @@
               <button class="button-ghost admin-dropdown-trigger" type="button" aria-expanded="false">Comunicados</button>
               <div class="admin-dropdown-menu">
                 <button class="button-ghost admin-menu-item" type="button" data-admin-view="new_notice">Nuevo comunicado</button>
-                <button class="button-ghost admin-menu-item" type="button" data-admin-view="manage_notices">Gestion de comunicados</button>
+                <button class="button-ghost admin-menu-item" type="button" data-admin-view="manage_notices">Gestión de comunicados</button>
               </div>
             </div>
 
             <div class="admin-dropdown">
               <button class="button-ghost admin-dropdown-trigger" type="button" aria-expanded="false">Ventas</button>
               <div class="admin-dropdown-menu">
-                <button class="button-ghost admin-menu-item" type="button" data-admin-view="prices">Administracion de precios</button>
+                <button class="button-ghost admin-menu-item" type="button" data-admin-view="prices">Administración de precios</button>
                 <button class="button-ghost admin-menu-item" type="button" data-admin-view="orders">Pedidos de trabajadores</button>
               </div>
             </div>
@@ -216,8 +216,8 @@
         <div class="admin-content">
           <section class="card admin-search-card">
             <div class="filter-field">
-              <label for="adminGlobalSearch">Busqueda global (DNI, nombre, correo, pedido, comunicado)</label>
-              <input id="adminGlobalSearch" placeholder="Escribe para filtrar en todos los modulos del admin" />
+              <label for="adminGlobalSearch">Búsqueda global (DNI, nombre, correo, pedido, comunicado)</label>
+              <input id="adminGlobalSearch" placeholder="Escribe para filtrar en todos los módulos del admin" />
             </div>
           </section>
           <section id="adminViewHome" class="admin-view">
@@ -228,7 +228,7 @@
             </article>
 
             <article class="card">
-              <h2>Configuracion de venta</h2>
+              <h2>Configuración de venta</h2>
               <div class="grid-2" style="margin-top:8px;">
                 <div class="field">
                   <label for="cfgNationalPrice" id="cfgNationalPriceLabel">Precio por Kg (S/)</label>
@@ -236,10 +236,10 @@
                 </div>
               </div>
               <div class="inline" style="margin-top:10px;">
-                <button class="button" id="saveConfigButton">Guardar configuracion</button>
+                <button class="button" id="saveConfigButton">Guardar configuración</button>
                 <button class="button-ghost" id="publishPriceButton" type="button">Publicar precio ahora</button>
               </div>
-              <p class="helper" id="pricePublishInfo">Precio aun no publicado para la semana actual.</p>
+              <p class="helper" id="pricePublishInfo">Precio aún no publicado para la semana actual.</p>
             </article>
 
             <article class="card">
@@ -261,7 +261,7 @@
 
           <section id="adminViewPrices" class="admin-view hidden">
             <article class="card">
-              <h2>Administracion de precios por semana</h2>
+              <h2>Administración de precios por semana</h2>
               <p class="subtle">Define y publica precios por ciclo semanal. No se permite modificar semanas anteriores a la actual.</p>
               <div class="grid-2" style="margin-top:8px;">
                 <div class="field">
@@ -291,7 +291,7 @@
                       <th>Rango</th>
                       <th>Precio/Kg</th>
                       <th>Publicado</th>
-                      <th>Accion</th>
+                      <th>Acción</th>
                     </tr>
                   </thead>
                   <tbody id="adminPriceWeeksBody"></tbody>
@@ -304,7 +304,7 @@
             <article class="card">
               <h2 id="noticeFormTitle">Nuevo comunicado</h2>
               <div class="field">
-                <label for="noticeTitle">Titulo</label>
+                <label for="noticeTitle">Título</label>
                 <input id="noticeTitle" />
               </div>
               <div class="field" style="margin-top:8px;">
@@ -312,11 +312,11 @@
                 <input id="noticeSummary" />
               </div>
               <div class="field" style="margin-top:8px;">
-                <label for="noticeArea">Area responsable</label>
+                <label for="noticeArea">Área responsable</label>
                 <input id="noticeArea" placeholder="Ej. RR.HH." />
               </div>
               <div class="field" style="margin-top:8px;">
-                <label for="noticeDate">Fecha de publicacion</label>
+                <label for="noticeDate">Fecha de publicación</label>
                 <input id="noticeDate" type="date" />
               </div>
               <div class="field" style="margin-top:8px;">
@@ -325,23 +325,23 @@
               </div>
               <div class="inline" style="margin-top:10px;">
                 <button class="button" id="createNoticeButton">Publicar comunicado</button>
-                <button class="button-ghost hidden" id="cancelNoticeEditButton" type="button">Cancelar edicion</button>
+                <button class="button-ghost hidden" id="cancelNoticeEditButton" type="button">Cancelar edición</button>
               </div>
             </article>
           </section>
 
           <section id="adminViewManageNotices" class="admin-view hidden">
             <article class="card">
-              <h2>Gestion de comunicados</h2>
+              <h2>Gestión de comunicados</h2>
               <div class="table-wrap">
                 <table>
                   <thead>
                     <tr>
-                      <th>Titulo</th>
-                      <th>Area</th>
-                      <th>Publicacion</th>
+                      <th>Título</th>
+                      <th>Área</th>
+                      <th>Publicación</th>
                       <th>Estado</th>
-                      <th>Accion</th>
+                      <th>Acción</th>
                     </tr>
                   </thead>
                   <tbody id="adminNoticeBody"></tbody>
@@ -369,7 +369,7 @@
                     <label for="filterOrderStatus">Estado</label>
                     <select id="filterOrderStatus">
                       <option value="">Todos los estados</option>
-                      <option value="pending_confirm">Pendiente confirmacion</option>
+                      <option value="pending_confirm">Pendiente confirmación</option>
                       <option value="price_published">Precio publicado</option>
                       <option value="requested">Solicitado</option>
                       <option value="approved">Aprobado</option>
@@ -432,7 +432,7 @@
                   </div>
                 </div>
               </div>
-              <p class="subtle">Administra datos y cambia contrasenas de acceso.</p>
+              <p class="subtle">Administra datos y cambia contraseñas de acceso.</p>
               <div class="table-wrap">
                 <table>
                   <thead>
@@ -501,7 +501,7 @@
                       <th>Canal</th>
                       <th>Entrega</th>
                       <th>Mensaje</th>
-                      <th>Accion</th>
+                      <th>Acción</th>
                     </tr>
                   </thead>
                   <tbody id="adminNotificationsBody"></tbody>
@@ -513,7 +513,7 @@
 
           <section id="adminViewAdmins" class="admin-view hidden">
             <article class="card">
-              <h2>Gestion de administradores</h2>
+              <h2>Gestión de administradores</h2>
               <p class="subtle">Solo super administrador puede crear y visualizar administradores.</p>
               <div class="grid-2" style="margin-top:8px;">
                 <div class="field">
@@ -525,8 +525,8 @@
                   <input id="newAdminName" placeholder="Nombre completo" />
                 </div>
                 <div class="field">
-                  <label for="newAdminPassword">Contrasena inicial</label>
-                  <input id="newAdminPassword" type="password" placeholder="Minimo 8 caracteres" />
+                  <label for="newAdminPassword">Contraseña inicial</label>
+                  <input id="newAdminPassword" type="password" placeholder="Mínimo 8 caracteres" />
                 </div>
               </div>
               <div class="inline" style="margin-top:10px;">
@@ -545,7 +545,7 @@
                       <th>Rol</th>
                       <th>Estado</th>
                       <th>Creado</th>
-                      <th>Ultimo acceso</th>
+                      <th>Último acceso</th>
                     </tr>
                   </thead>
                   <tbody id="adminUsersBody"></tbody>
@@ -576,6 +576,8 @@
     <script src="js/main.js" defer></script>
 </body>
 </html>
+
+
 
 
 

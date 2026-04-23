@@ -1,23 +1,23 @@
 import { z } from "zod";
 
-const dniSchema = z.string().trim().regex(/^\d{8}$/, "DNI invalido.");
-const emailSchema = z.string().trim().email("Correo invalido.").max(120, "Correo demasiado largo.");
+const dniSchema = z.string().trim().regex(/^\d{8}$/, "DNI inválido.");
+const emailSchema = z.string().trim().email("Correo inválido.").max(120, "Correo demasiado largo.");
 const nameSchema = z.string().trim().min(1, "Nombre requerido.").max(120, "Nombre demasiado largo.");
-const phoneSchema = z.string().trim().regex(/^\d{9,12}$/, "Celular invalido.");
-const passwordSchema = z.string().min(8, "Contrasena invalida. Minimo 8 caracteres.").max(128, "Contrasena demasiado larga.");
+const phoneSchema = z.string().trim().regex(/^\d{9,12}$/, "Celular inválido.");
+const passwordSchema = z.string().min(8, "Contraseña inválida. Mínimo 8 caracteres.").max(128, "Contraseña demasiado larga.");
 const workerLoginPasswordSchema = z
   .string()
-  .min(4, "Contrasena invalida.")
-  .max(128, "Contrasena demasiado larga.");
-const orderIdSchema = z.string().trim().regex(/^[A-Za-z0-9_-]{4,120}$/, "orderId invalido.");
-const adminUsernameSchema = z.string().trim().min(3, "Usuario admin invalido.").max(80, "Usuario admin demasiado largo.").regex(/^[A-Za-z0-9._-]+$/, "Usuario admin invalido.");
+  .min(4, "Contraseña inválida.")
+  .max(128, "Contraseña demasiado larga.");
+const orderIdSchema = z.string().trim().regex(/^[A-Za-z0-9_-]{4,120}$/, "orderId inválido.");
+const adminUsernameSchema = z.string().trim().min(3, "Usuario admin inválido.").max(80, "Usuario admin demasiado largo.").regex(/^[A-Za-z0-9._-]+$/, "Usuario admin inválido.");
 
 export const loginBodySchema = z.discriminatedUnion("role", [
   z
     .object({
       role: z.literal("admin"),
       user: z.string().trim().min(1, "Usuario requerido.").max(80, "Usuario demasiado largo."),
-      pin: z.string().trim().min(6, "PIN invalido.").max(20, "PIN demasiado largo.")
+      pin: z.string().trim().min(6, "PIN inválido.").max(20, "PIN demasiado largo.")
     })
     .strict(),
   z
@@ -55,7 +55,7 @@ export const stateUpdateBodySchema = z
 
 export const workerCreateOrderBodySchema = z
   .object({
-    kg: z.number().positive("Cantidad invalida.").max(2, "Maximo 2 Kg por persona.")
+    kg: z.number().positive("Cantidad inválida.").max(2, "Máximo 2 Kg por persona.")
   })
   .strict();
 
@@ -80,7 +80,7 @@ export const dniLookupQuerySchema = z
 export const authRevokeBodySchema = z.union([
   z
     .object({
-      sessionId: z.string().trim().uuid("sessionId invalido."),
+      sessionId: z.string().trim().uuid("sessionId inválido."),
       reason: z.string().trim().max(200, "Motivo demasiado largo.").optional()
     })
     .strict(),
@@ -124,8 +124,9 @@ export const legacyCreateUserBodySchema = z
     if (pass.length < 8) {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
-        message: "Contrasena invalida. Minimo 8 caracteres.",
+        message: "Contraseña inválida. Mínimo 8 caracteres.",
         path: ["password"]
       });
     }
   });
+

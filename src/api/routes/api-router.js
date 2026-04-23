@@ -33,7 +33,7 @@ import { getState, persistState } from "../../modules/state/state.repository.js"
 const router = Router();
 let memoryState = null;
 const STATE_ENDPOINT_TRANSITION_NOTICE =
-  "Endpoint /api/state en transicion. Migrar gradualmente a endpoints especificos por recurso.";
+  "Endpoint /api/state en transición. Migrar gradualmente a endpoints especificos por recurso.";
 const STATE_ENDPOINT_SUNSET = "Wed, 31 Dec 2026 23:59:59 GMT";
 
 async function safeGetState() {
@@ -60,7 +60,7 @@ function markStateEndpointAsTransition(res) {
 
 async function safePersistState(data) {
   if (!isFirebaseConfigured && env.nodeEnv === "production") {
-    throw new Error("[state] Persistencia en memoria bloqueada en produccion.");
+    throw new Error("[state] Persistencia en memoria bloqueada en producción.");
   }
   memoryState = data;
   if (!isFirebaseConfigured) return false;
@@ -262,8 +262,8 @@ function addOrderHistoryEntry(state, order, action, detail, actor) {
 function addOrderNotifications(state, order) {
   if (!Array.isArray(state.notifications)) state.notifications = [];
   const templates = state?.settings?.notificationTemplates || {};
-  const whatsappTemplate = templates.whatsapp || "BlueSales: tu pedido {{orderId}} ahora esta en estado {{status}}.";
-  const emailTemplate = templates.email || "BlueSales: tu pedido {{orderId}} ahora esta en estado {{status}}.";
+  const whatsappTemplate = templates.whatsapp || "BlueSales: tu pedido {{orderId}} ahora está en estado {{status}}.";
+  const emailTemplate = templates.email || "BlueSales: tu pedido {{orderId}} ahora está en estado {{status}}.";
 
   if (order?.workerPhone) {
     state.notifications.unshift({
@@ -358,19 +358,19 @@ async function authenticateRequest(req, res, options = {}) {
   const profile = verifyToken(token);
   if (!profile) {
     logSecurityEvent("session_invalid", req);
-    res.status(401).json({ message: "Sesion invalida o expirada." });
+    res.status(401).json({ message: "Sesión inválida o expirada." });
     return null;
   }
 
   if (await isSessionRevoked(profile)) {
     logSecurityEvent("session_revoked", req, { sid: profile.sid, role: profile.role, id: profile.id });
-    res.status(401).json({ message: "Sesion revocada." });
+    res.status(401).json({ message: "Sesión revocada." });
     return null;
   }
 
   if (!hasRoleAccess(profile.role, roles)) {
     logSecurityEvent("authorization_denied", req, { role: profile.role, requiredRoles: roles });
-    res.status(403).json({ message: "No autorizado para esta operacion." });
+    res.status(403).json({ message: "No autorizado para esta operación." });
     return null;
   }
 
@@ -475,7 +475,7 @@ router.post("/auth/login", loginRateLimiter, async (req, res, next) => {
           return res.status(403).json({ message: "Usuario admin inhabilitado." });
         }
         logSecurityEvent("auth_login_failed", req, { role: "admin", user: input.user });
-        return res.status(401).json({ message: "Credenciales invalidas." });
+        return res.status(401).json({ message: "Credenciales inválidas." });
       }
 
       const profile = authResult.profile;
@@ -493,11 +493,11 @@ router.post("/auth/login", loginRateLimiter, async (req, res, next) => {
     const passwordStatus = worker ? await verifyWorkerPassword(worker, workerPass) : { matches: false };
     if (!worker || !passwordStatus.matches) {
       logSecurityEvent("auth_login_failed", req, { role: "worker", workerId });
-      return res.status(401).json({ message: "Credenciales invalidas." });
+      return res.status(401).json({ message: "Credenciales inválidas." });
     }
     if (worker.active === false) {
       logSecurityEvent("auth_login_blocked_disabled_user", req, { workerId });
-      return res.status(403).json({ message: "Tu usuario esta inhabilitado. Contacta al administrador." });
+      return res.status(403).json({ message: "Tu usuario está inhabilitado. Contacta al administrador." });
     }
 
     const secureWorker = passwordStatus.worker || worker;
@@ -605,7 +605,7 @@ router.post("/worker/orders", async (req, res, next) => {
     const usedKg = getWorkerWeeklyKg(data.orders, profile.id, new Date());
     const nextKg = toNumber(input.kg);
     if (usedKg + nextKg > 2) {
-      return res.status(400).json({ message: "Superas limite semanal de 2 Kg." });
+      return res.status(400).json({ message: "Superas límite semanal de 2 Kg." });
     }
 
     const cycleKey = getCycleKey(new Date());
@@ -658,7 +658,7 @@ router.post("/worker/orders/:orderId/confirm", async (req, res, next) => {
     const order = (Array.isArray(data.orders) ? data.orders : []).find((row) => row.id === orderId && row.workerId === worker.id);
     if (!order) return res.status(404).json({ message: "Pedido no encontrado." });
     if (order.status !== "price_published") {
-      return res.status(400).json({ message: "Aun no hay precio publicado para confirmar esta compra." });
+      return res.status(400).json({ message: "Aún no hay precio publicado para confirmar esta compra." });
     }
 
     if (!isBeforePendingDeadline(order)) {
@@ -784,7 +784,7 @@ router.post("/auth/revoke", async (req, res, next) => {
         targetRole: input.role,
         targetId: input.id
       });
-      return res.status(403).json({ message: "Solo super administrador puede revocar sesiones de super administrador." });
+      return res.status(403).json({ message: "Solo super administrador puede revocar sesiónes de super administrador." });
     }
 
     if ("sessionId" in input) {
@@ -839,11 +839,11 @@ router.post("/reports/orders/export-template", async (req, res, next) => {
 
     const timestamp = new Date().toISOString().slice(0, 10);
     res.setHeader("Content-Type", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
-    res.setHeader("Content-Disposition", `attachment; filename=\"formato_venta_arandano_${timestamp}.xlsx\"`);
+    res.setHeader("Content-Disposition", `attachment; filename=\"formato_venta_arándano_${timestamp}.xlsx\"`);
     return res.send(Buffer.from(buffer));
   } catch (error) {
     if (String(error?.code || "") === "ENOENT") {
-      return res.status(500).json({ message: "No se encontro el formato de exportacion en /templates." });
+      return res.status(500).json({ message: "No se encontró el formato de exportación en /templates." });
     }
     return next(error);
   }
@@ -961,3 +961,5 @@ router.put("/state", async (req, res, next) => {
 });
 
 export default router;
+
+

@@ -48,7 +48,7 @@ export const isFirebaseConfigured = validateFirebaseConfig(firebaseConfig);
 
 if (!isFirebaseConfigured) {
   if (env.nodeEnv === "production") {
-    throw new Error("[startup] Firebase es obligatorio en produccion. Configura FIREBASE_* antes de iniciar.");
+    throw new Error("[startup] Firebase es obligatorio en producción. Configura FIREBASE_* antes de iniciar.");
   }
   console.warn("[startup] Firebase env is incomplete. Falling back to in-memory state.");
 }
@@ -60,3 +60,4 @@ export const firebaseApp = isFirebaseConfigured
 export const firestore = isFirebaseConfigured
   ? initializeFirestore(firebaseApp, { ignoreUndefinedProperties: true })
   : null;
+

@@ -20,7 +20,7 @@ let schemaReadyPromise = null;
 function assertPersistentStorageAvailable() {
   if (firestore && SETTINGS_REF) return;
   if (env.nodeEnv === "production") {
-    throw new Error("[state] Persistencia en memoria bloqueada en produccion. Firebase/Firestore no disponible.");
+    throw new Error("[state] Persistencia en memoria bloqueada en producción. Firebase/Firestore no disponible.");
   }
 }
 
@@ -40,8 +40,8 @@ function ensureDefaults(data) {
   if (!("pricePublishedCycle" in next.settings)) next.settings.pricePublishedCycle = "";
   if (!next.settings.notificationTemplates) {
     next.settings.notificationTemplates = {
-      whatsapp: "BlueSales: tu pedido {{orderId}} ahora esta en estado {{status}}. Entrega estimada: {{deliveryDate}}.",
-      email: "BlueSales: tu pedido {{orderId}} ahora esta en estado {{status}}. Entrega estimada: {{deliveryDate}}."
+      whatsapp: "BlueSales: tu pedido {{orderId}} ahora está en estado {{status}}. Entrega estimada: {{deliveryDate}}.",
+      email: "BlueSales: tu pedido {{orderId}} ahora está en estado {{status}}. Entrega estimada: {{deliveryDate}}."
     };
   }
   if (!Array.isArray(next.users)) next.users = [];
@@ -263,3 +263,4 @@ export async function persistState(data) {
   await ensureSchema();
   memoryState = await persistToCollections(data);
 }
+

@@ -231,7 +231,7 @@ export async function createAdminUserBySuperAdmin(input, actorProfile) {
     throw buildServiceError("name requerido.", 400, "invalid_name");
   }
   if (password.length < 8) {
-    throw buildServiceError("password invalido. Minimo 8 caracteres.", 400, "invalid_password");
+    throw buildServiceError("password inválido. Mínimo 8 caracteres.", 400, "invalid_password");
   }
 
   const existing = await getAdminFromStore(username);
@@ -257,3 +257,4 @@ export async function createAdminUserBySuperAdmin(input, actorProfile) {
   }
   return safe;
 }
+

@@ -13,7 +13,7 @@ export function isBcryptHash(value) {
 
 export async function hashPassword(plainTextPassword) {
   const raw = String(plainTextPassword || "");
-  if (!raw) throw new Error("Contrasena vacia.");
+  if (!raw) throw new Error("Contraseña vacia.");
   return bcrypt.hash(raw, env.auth.passwordHashRounds);
 }
 
@@ -79,3 +79,4 @@ export async function verifyWorkerPassword(worker, plainTextPassword) {
     worker: withPasswordHash(base, nextHash)
   };
 }
+
