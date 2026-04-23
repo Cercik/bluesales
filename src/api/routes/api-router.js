@@ -32,6 +32,7 @@ import { getState, persistState } from "../../modules/state/state.repository.js"
 
 const router = Router();
 let memoryState = null;
+let statePasswordsVerified = false;
 const STATE_ENDPOINT_TRANSITION_NOTICE =
   "Endpoint /api/state en transición. Migrar gradualmente a endpoints especificos por recurso.";
 const STATE_ENDPOINT_SUNSET = "Wed, 31 Dec 2026 23:59:59 GMT";
@@ -39,13 +40,20 @@ const STATE_ENDPOINT_SUNSET = "Wed, 31 Dec 2026 23:59:59 GMT";
 async function safeGetState() {
   try {
     const data = await getState();
+    if (statePasswordsVerified) {
+      memoryState = data;
+      return data;
+    }
     const migrated = await migrateStateUserPasswordsIfRequired(data);
+    statePasswordsVerified = true;
     memoryState = migrated;
     return migrated;
   } catch (error) {
     if (env.nodeEnv === "production") throw error;
     if (!memoryState) memoryState = buildDefaultState();
+    if (statePasswordsVerified) return memoryState;
     const migrated = await migrateStateUserPasswordsIfRequired(memoryState);
+    statePasswordsVerified = true;
     memoryState = migrated;
     return migrated;
   }
@@ -63,6 +71,7 @@ async function safePersistState(data) {
     throw new Error("[state] Persistencia en memoria bloqueada en producción.");
   }
   memoryState = data;
+  statePasswordsVerified = false;
   if (!isFirebaseConfigured) return false;
   try {
     await persistState(data);

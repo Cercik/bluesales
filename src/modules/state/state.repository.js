@@ -16,6 +16,13 @@ const COLLECTIONS = {
 
 let memoryState = buildDefaultState();
 let schemaReadyPromise = null;
+let stateHydratedFromStore = false;
+let lastStateSyncMs = 0;
+const STATE_CACHE_TTL_MS = (() => {
+  const raw = Number(process.env.STATE_CACHE_TTL_MS);
+  if (Number.isFinite(raw) && raw >= 0) return raw;
+  return env.nodeEnv === "production" ? 10_000 : 1_000;
+})();
 
 function assertPersistentStorageAvailable() {
   if (firestore && SETTINGS_REF) return;
@@ -249,8 +256,14 @@ export async function getState() {
   assertPersistentStorageAvailable();
   if (!firestore || !SETTINGS_REF) return ensureDefaults(memoryState);
   await ensureSchema();
+  const now = Date.now();
+  if (stateHydratedFromStore && (now - lastStateSyncMs) <= STATE_CACHE_TTL_MS) {
+    return ensureDefaults(memoryState);
+  }
   const state = await readFromCollections();
   memoryState = state;
+  stateHydratedFromStore = true;
+  lastStateSyncMs = now;
   return state;
 }
 
@@ -258,9 +271,13 @@ export async function persistState(data) {
   assertPersistentStorageAvailable();
   if (!firestore || !SETTINGS_REF) {
     memoryState = ensureDefaults(data);
+    stateHydratedFromStore = true;
+    lastStateSyncMs = Date.now();
     return;
   }
   await ensureSchema();
   memoryState = await persistToCollections(data);
+  stateHydratedFromStore = true;
+  lastStateSyncMs = Date.now();
 }
 
