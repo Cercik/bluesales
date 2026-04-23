@@ -35,7 +35,10 @@ export const registerBodySchema = z
     name: nameSchema,
     phone: phoneSchema,
     email: emailSchema,
-    password: passwordSchema
+    password: passwordSchema,
+    privacyAccepted: z.boolean().refine((value) => value === true, "Debes aceptar la Pol\u00edtica de Privacidad."),
+    privacyPolicyVersion: z.string().trim().min(1, "Versi\u00f3n de pol\u00edtica requerida.").max(40, "Versi\u00f3n de pol\u00edtica inv\u00e1lida.").optional(),
+    privacyPolicyUrl: z.string().trim().url("URL de pol\u00edtica inv\u00e1lida.").max(400, "URL de pol\u00edtica demasiado larga.").optional()
   })
   .strict();
 

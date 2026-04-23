@@ -1,5 +1,7 @@
 const API_BASE = "/api";
 const SESSION_KEY = "bluesales_session_v3";
+const PRIVACY_POLICY_PATH = "/privacy.html";
+const PRIVACY_POLICY_VERSION = "2026-04-23";
 
 const STATUS_LABELS = {
   pending_confirm: "Pendiente confirmación",
@@ -1612,20 +1614,23 @@ let workerDniLookupManualMode = false;
       const phone = document.getElementById("workerPhone").value.trim();
       const email = document.getElementById("workerEmail").value.trim();
       const password = document.getElementById("workerPasswordRegister").value;
+      const consentAccepted = Boolean(document.getElementById("workerDataConsent")?.checked);
 
       if (!dni || !phone || !email || !password) {
-        return showToast("Completa DNI, celular, correo y contraseña.", "error");
+        return showToast("Completa DNI, celular, correo y contrase\u00f1a.", "error");
       }
-      if (!isValidDni(dni)) return showToast("El DNI debe tener 8 digitos numéricos.", "error");
-      if (password.length < 8) return showToast("La contraseña debe tener al menos 8 caracteres.", "error");
-      if (!isValidPhone(phone)) return showToast("Celular inválido. Usa 9 a 12 digitos.", "error");
-      if (!isValidEmail(email)) return showToast("Correo inválido.", "error");
-      if (state.data.users.some((u) => u.id === dni)) return showToast("Ese DNI ya está registrado. Inicia sesión.", "error");
+      if (!isValidDni(dni)) return showToast("El DNI debe tener 8 d\u00edgitos num\u00e9ricos.", "error");
+      if (password.length < 8) return showToast("La contrase\u00f1a debe tener al menos 8 caracteres.", "error");
+      if (!isValidPhone(phone)) return showToast("Celular inv\u00e1lido. Usa 9 a 12 d\u00edgitos.", "error");
+      if (!isValidEmail(email)) return showToast("Correo inv\u00e1lido.", "error");
+      if (!consentAccepted) return showToast("Debes aceptar la Pol\u00edtica de Privacidad para registrarte.", "error");
+      if (state.data.users.some((u) => u.id === dni)) return showToast("Ese DNI ya est\u00e1 registrado. Inicia sesi\u00f3n.", "error");
       if (!name) {
         const ok = await lookupWorkerNameByDni(dni);
         name = nameInput.value.trim();
         if (!ok && !name) return showToast("Ingresa tu nombre completo para continuar.", "error");
       }
+      const privacyPolicyUrl = new URL(PRIVACY_POLICY_PATH, window.location.origin).toString();
 
       try {
         const response = await fetch(`${API_BASE}/auth/register`, {
@@ -1636,7 +1641,10 @@ let workerDniLookupManualMode = false;
             name,
             phone: normalizePhone(phone),
             email,
-            password
+            password,
+            privacyAccepted: true,
+            privacyPolicyVersion: PRIVACY_POLICY_VERSION,
+            privacyPolicyUrl
           })
         });
         if (!response.ok) {
@@ -1652,7 +1660,6 @@ let workerDniLookupManualMode = false;
       renderAll();
       showToast("Registro completado.", "success");
     }
-
     async function adminLogin() {
       const user = document.getElementById("adminUser").value.trim();
       const pin = document.getElementById("adminPin").value.trim();

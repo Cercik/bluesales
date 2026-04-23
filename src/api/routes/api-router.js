@@ -36,6 +36,29 @@ let statePasswordsVerified = false;
 const STATE_ENDPOINT_TRANSITION_NOTICE =
   "Endpoint /api/state en transición. Migrar gradualmente a endpoints especificos por recurso.";
 const STATE_ENDPOINT_SUNSET = "Wed, 31 Dec 2026 23:59:59 GMT";
+const DEFAULT_PRIVACY_POLICY_VERSION = "2026-04-23";
+const DEFAULT_PRIVACY_POLICY_PATH = "/privacy.html";
+
+function getClientIp(req) {
+  const forwardedFor = String(req?.headers?.["x-forwarded-for"] || "");
+  const forwardedIp = forwardedFor
+    .split(",")
+    .map((item) => item.trim())
+    .find(Boolean);
+  const directIp = String(req?.ip || req?.socket?.remoteAddress || "").trim();
+  return String(forwardedIp || directIp).slice(0, 100);
+}
+
+function normalizePrivacyPolicyVersion(rawVersion) {
+  const value = String(rawVersion || "").trim().slice(0, 40);
+  return value || DEFAULT_PRIVACY_POLICY_VERSION;
+}
+
+function normalizePrivacyPolicyUrl(rawUrl) {
+  const value = String(rawUrl || "").trim().slice(0, 400);
+  if (!value) return DEFAULT_PRIVACY_POLICY_PATH;
+  return value;
+}
 
 async function safeGetState() {
   try {
@@ -110,6 +133,7 @@ function stripUserCredentials(worker) {
   const safeWorker = worker && typeof worker === "object" ? { ...worker } : {};
   delete safeWorker.password;
   delete safeWorker.passwordHash;
+  delete safeWorker.privacyConsentAudit;
   return safeWorker;
 }
 
@@ -547,6 +571,16 @@ router.post("/auth/register", registerRateLimiter, async (req, res, next) => {
     const normalizedPhone = input.phone.replace(/\D/g, "");
     const workerEmail = input.email.trim();
     const pass = input.password;
+    const consentedAt = new Date().toISOString();
+    const privacyPolicyVersion = normalizePrivacyPolicyVersion(input.privacyPolicyVersion);
+    const privacyPolicyUrl = normalizePrivacyPolicyUrl(input.privacyPolicyUrl);
+    const privacyConsentAudit = {
+      acceptedAt: consentedAt,
+      version: privacyPolicyVersion,
+      policyUrl: privacyPolicyUrl,
+      ip: getClientIp(req),
+      userAgent: String(req.get("user-agent") || "").slice(0, 240)
+    };
 
     const identityCheck = await validateWorkerIdentity({ dni, fullName });
     if (!identityCheck.ok) {
@@ -580,7 +614,13 @@ router.post("/auth/register", registerRateLimiter, async (req, res, next) => {
       email: workerEmail,
       passwordHash,
       active: true,
-      createdAt: new Date().toISOString()
+      createdAt: consentedAt,
+      privacyConsent: {
+        accepted: true,
+        acceptedAt: consentedAt,
+        version: privacyPolicyVersion
+      },
+      privacyConsentAudit
     };
 
     data.users = data.users.filter((u) => u.id !== dni);
