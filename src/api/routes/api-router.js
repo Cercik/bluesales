@@ -541,8 +541,18 @@ router.post("/auth/register", registerRateLimiter, async (req, res, next) => {
 
     const identityCheck = await validateWorkerIdentity({ dni, fullName });
     if (!identityCheck.ok) {
-      logSecurityEvent("auth_register_identity_failed", req, { dni, status: identityCheck.status || 422 });
-      return res.status(identityCheck.status || 422).json({ message: identityCheck.message || "No se pudo validar identidad." });
+      const identityStatus = Number(identityCheck.status || 0);
+      const isIdentityServiceUnavailable = identityStatus >= 500;
+      if (!isIdentityServiceUnavailable) {
+        logSecurityEvent("auth_register_identity_failed", req, { dni, status: identityStatus || 422 });
+        return res.status(identityCheck.status || 422).json({ message: identityCheck.message || "No se pudo validar identidad." });
+      }
+      // Fail-open for registration when the external DNI provider is down/misconfigured.
+      logSecurityEvent("auth_register_identity_degraded", req, {
+        dni,
+        status: identityStatus || 503,
+        reason: identityCheck.message || "identity_provider_unavailable"
+      });
     }
 
     const data = await safeGetState();
