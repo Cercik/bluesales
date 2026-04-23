@@ -101,15 +101,9 @@ const superAdminName = String(process.env.SUPER_ADMIN_NAME || "Super Administrad
 const dniApiUrlTemplate = String(process.env.SUNAT_DNI_API_URL_TEMPLATE || "").trim();
 const dniApiToken = String(process.env.SUNAT_DNI_API_TOKEN || "").trim();
 const dniApiKey = String(process.env.SUNAT_DNI_API_KEY || "").trim();
-const hasDniProviderConfig = Boolean(dniApiUrlTemplate) && (
-  Boolean(dniApiToken)
-  || Boolean(dniApiKey)
-  || /([?&])token=/.test(dniApiUrlTemplate)
-);
-const dniValidationEnabled = parseBoolean(
-  process.env.SUNAT_DNI_VALIDATION_ENABLED,
-  nodeEnv === "production" && hasDniProviderConfig
-);
+const dniValidationEnabled = nodeEnv === "production"
+  ? true
+  : parseBoolean(process.env.SUNAT_DNI_VALIDATION_ENABLED, false);
 
 if (nodeEnv === "production" && corsAllowedOrigins.length === 0) {
   throw new Error("[startup] En produccion debes definir CORS_ALLOWED_ORIGINS con una whitelist explicita.");
