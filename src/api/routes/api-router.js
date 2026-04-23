@@ -26,6 +26,7 @@ import { logSecurityEvent } from "../../modules/security/security-log.service.js
 import { sanitizeUnknown } from "../../modules/security/data-sanitizer.service.js";
 import { createToken, readBearerToken, verifyToken } from "../../modules/auth/token.service.js";
 import { lookupDniIdentity, validateWorkerIdentity } from "../../modules/identity/dni-validation.service.js";
+import { sendWhatsappTextMessage } from "../../modules/notifications/whatsapp-apisperu.service.js";
 import { buildOrdersTemplateWorkbook } from "../../modules/reports/orders-template-export.service.js";
 import { buildDefaultState } from "../../modules/state/default-state.factory.js";
 import { getState, persistState } from "../../modules/state/state.repository.js";
@@ -292,14 +293,14 @@ function addOrderHistoryEntry(state, order, action, detail, actor) {
   }
 }
 
-function addOrderNotifications(state, order) {
+async function addOrderNotifications(state, order) {
   if (!Array.isArray(state.notifications)) state.notifications = [];
   const templates = state?.settings?.notificationTemplates || {};
   const whatsappTemplate = templates.whatsapp || "BlueSales: tu pedido {{orderId}} ahora está en estado {{status}}.";
   const emailTemplate = templates.email || "BlueSales: tu pedido {{orderId}} ahora está en estado {{status}}.";
 
   if (order?.workerPhone) {
-    state.notifications.unshift({
+    const notification = {
       id: uid("ntf"),
       workerId: String(order.workerId || ""),
       workerName: String(order.workerName || ""),
@@ -308,8 +309,31 @@ function addOrderNotifications(state, order) {
       message: applyTemplate(whatsappTemplate, order),
       sent: false,
       createdAt: new Date().toISOString()
-    });
+    };
+    state.notifications.unshift(notification);
+
+    if (env.whatsapp.enabled && env.whatsapp.autoSendOrderNotifications) {
+      const delivery = await sendWhatsappTextMessage({
+        phone: notification.target,
+        message: notification.message
+      });
+      notification.provider = "APISPERU";
+      notification.providerStatus = Number(delivery?.status || 0);
+      notification.providerCode = String(delivery?.code || "");
+      notification.providerMessage = String(delivery?.providerMessage || delivery?.error || "");
+      notification.providerMessageId = String(delivery?.messageId || "");
+      notification.providerTarget = String(delivery?.target || notification.target);
+      notification.lastAttemptAt = new Date().toISOString();
+      if (delivery?.ok) {
+        notification.sent = true;
+        notification.sentAt = notification.lastAttemptAt;
+      } else {
+        notification.sent = false;
+        notification.error = String(delivery?.error || "No se pudo enviar WhatsApp.");
+      }
+    }
   }
+
   if (order?.workerEmail) {
     state.notifications.unshift({
       id: uid("ntf"),
@@ -323,7 +347,6 @@ function addOrderNotifications(state, order) {
     });
   }
 }
-
 async function mergeUsersWithCredentials(nextUsers, currentUsers) {
   const currentById = new Map(
     (Array.isArray(currentUsers) ? currentUsers : []).map((worker) => [String(worker?.id || ""), worker])
@@ -714,7 +737,7 @@ router.post("/worker/orders/:orderId/confirm", async (req, res, next) => {
       order.status = "cancelled";
       order.cancelledAt = new Date().toISOString();
       order.cancelReason = "No confirmo su compra hasta el lunes a las 23:59.";
-      addOrderNotifications(data, order);
+      await addOrderNotifications(data, order);
       addOrderHistoryEntry(data, order, "cancelled", order.cancelReason, profile.id);
       const persisted = await safePersistState(data);
       logSecurityEvent("worker_order_auto_cancelled_deadline", req, {
@@ -734,7 +757,7 @@ router.post("/worker/orders/:orderId/confirm", async (req, res, next) => {
     delete order.cancelledAt;
     delete order.cancelReason;
 
-    addOrderNotifications(data, order);
+    await addOrderNotifications(data, order);
     addOrderHistoryEntry(data, order, "confirmed", "Compra confirmada por trabajador", profile.id);
     const persisted = await safePersistState(data);
     logSecurityEvent("worker_order_confirmed", req, {
@@ -768,7 +791,7 @@ router.post("/worker/orders/:orderId/cancel", async (req, res, next) => {
     order.status = "cancelled";
     order.cancelledAt = new Date().toISOString();
     order.cancelReason = "Cancelado por trabajador.";
-    addOrderNotifications(data, order);
+    await addOrderNotifications(data, order);
     addOrderHistoryEntry(data, order, "cancelled_by_worker", order.cancelReason, profile.id);
 
     const persisted = await safePersistState(data);

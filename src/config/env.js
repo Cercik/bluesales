@@ -114,6 +114,10 @@ const dniApiKey = normalizeApiCredential(process.env.SUNAT_DNI_API_KEY);
 const dniValidationEnabled = nodeEnv === "production"
   ? true
   : parseBoolean(process.env.SUNAT_DNI_VALIDATION_ENABLED, false);
+const whatsappApiBaseUrl = String(process.env.WHATSAPP_APISPERU_BASE_URL || "https://whatsapp.apisperu.com/api/v1").trim();
+const whatsappApiToken = normalizeApiCredential(process.env.WHATSAPP_APISPERU_TOKEN);
+const whatsappDeviceId = String(process.env.WHATSAPP_APISPERU_DEVICE_ID || "").trim();
+const whatsappEnabled = parseBoolean(process.env.WHATSAPP_APISPERU_ENABLED, false);
 
 if (nodeEnv === "production" && corsAllowedOrigins.length === 0) {
   throw new Error("[startup] En producción debes definir CORS_ALLOWED_ORIGINS con una whitelist explicita.");
@@ -167,6 +171,14 @@ export const env = {
     apiKeyHeader: String(process.env.SUNAT_DNI_API_KEY_HEADER || "x-api-key").trim(),
     timeoutMs: parseNumber(process.env.SUNAT_DNI_TIMEOUT_MS, 8000),
     strictNameMatch: parseBoolean(process.env.SUNAT_DNI_STRICT_NAME_MATCH, true)
+  },
+  whatsapp: {
+    enabled: whatsappEnabled,
+    apiBaseUrl: whatsappApiBaseUrl.replace(/\/+$/, ""),
+    apiToken: whatsappApiToken,
+    deviceId: whatsappDeviceId,
+    timeoutMs: parseNumber(process.env.WHATSAPP_APISPERU_TIMEOUT_MS, 8000),
+    autoSendOrderNotifications: parseBoolean(process.env.WHATSAPP_APISPERU_AUTO_SEND_ORDER_NOTIFICATIONS, true)
   }
 };
 
