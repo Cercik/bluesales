@@ -118,8 +118,9 @@ async function fetchWithTimeout(url, options, timeoutMs) {
 function buildUrl(dni) {
   let template = env.dniValidation.apiUrlTemplate;
   if (!template) return null;
+  const lookupToken = env.dniValidation.apiToken || env.dniValidation.apiKey;
   if (template.includes("{token}")) {
-    template = template.replaceAll("{token}", encodeURIComponent(env.dniValidation.apiToken));
+    template = template.replaceAll("{token}", encodeURIComponent(lookupToken));
   }
   if (template.includes("{dni}")) return template.replaceAll("{dni}", encodeURIComponent(dni));
   if (/\/dni\/\d{8}(?=[/?]|$)/.test(template)) {

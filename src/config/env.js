@@ -28,6 +28,13 @@ function parseStringList(value) {
     .filter(Boolean);
 }
 
+function normalizeApiCredential(value) {
+  const raw = String(value || "").trim().replace(/^['"]|['"]$/g, "");
+  if (!raw) return "";
+  const withoutBearer = raw.replace(/^bearer\s+/i, "");
+  return withoutBearer.replace(/\s+/g, "");
+}
+
 function validateTokenSecret(rawValue) {
   const secret = String(rawValue || "").trim();
   if (secret.length < 32) {
@@ -100,8 +107,8 @@ const superAdminPassword = validateSuperAdminPassword(process.env.SUPER_ADMIN_PA
 const superAdminName = String(process.env.SUPER_ADMIN_NAME || "Super Administrador").trim() || "Super Administrador";
 const defaultDniApiTemplate = "https://dniruc.apisperu.com/api/v1/dni/{dni}?token={token}";
 const dniApiUrlTemplate = String(process.env.SUNAT_DNI_API_URL_TEMPLATE || (nodeEnv === "production" ? defaultDniApiTemplate : "")).trim();
-const dniApiToken = String(process.env.SUNAT_DNI_API_TOKEN || "").trim();
-const dniApiKey = String(process.env.SUNAT_DNI_API_KEY || "").trim();
+const dniApiToken = normalizeApiCredential(process.env.SUNAT_DNI_API_TOKEN);
+const dniApiKey = normalizeApiCredential(process.env.SUNAT_DNI_API_KEY);
 const dniValidationEnabled = nodeEnv === "production"
   ? true
   : parseBoolean(process.env.SUNAT_DNI_VALIDATION_ENABLED, false);
