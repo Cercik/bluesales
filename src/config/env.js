@@ -98,7 +98,8 @@ const corsAllowNoOrigin = parseBoolean(process.env.CORS_ALLOW_NO_ORIGIN, true);
 const superAdminUser = validateSuperAdminUser(process.env.SUPER_ADMIN_USER);
 const superAdminPassword = validateSuperAdminPassword(process.env.SUPER_ADMIN_PASSWORD);
 const superAdminName = String(process.env.SUPER_ADMIN_NAME || "Super Administrador").trim() || "Super Administrador";
-const dniApiUrlTemplate = String(process.env.SUNAT_DNI_API_URL_TEMPLATE || "").trim();
+const defaultDniApiTemplate = "https://dniruc.apisperu.com/api/v1/dni/{dni}?token={token}";
+const dniApiUrlTemplate = String(process.env.SUNAT_DNI_API_URL_TEMPLATE || (nodeEnv === "production" ? defaultDniApiTemplate : "")).trim();
 const dniApiToken = String(process.env.SUNAT_DNI_API_TOKEN || "").trim();
 const dniApiKey = String(process.env.SUNAT_DNI_API_KEY || "").trim();
 const dniValidationEnabled = nodeEnv === "production"
