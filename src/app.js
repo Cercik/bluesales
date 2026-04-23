@@ -12,21 +12,28 @@ import { logSecurityEvent } from "./modules/security/security-log.service.js";
 import { readBearerToken, verifyToken } from "./modules/auth/token.service.js";
 import { ensureSchema, getState, persistState } from "./modules/state/state.repository.js";
 
-function buildCorsOptions() {
+const CORS_METHODS = ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"];
+const CORS_ALLOWED_HEADERS = ["Content-Type", "Authorization"];
+
+function buildApiCorsOptions(req, callback) {
   const allowedOrigins = new Set(env.http.corsAllowedOrigins);
-  return {
-    origin(origin, callback) {
+  const requestMethod = String(req?.method || "GET").toUpperCase();
+  const isReadOnlyMethod = requestMethod === "GET" || requestMethod === "HEAD" || requestMethod === "OPTIONS";
+  const allowNoOrigin = env.http.corsAllowNoOrigin || isReadOnlyMethod;
+
+  callback(null, {
+    origin(origin, originCallback) {
       if (!origin) {
-        if (env.http.corsAllowNoOrigin) return callback(null, true);
-        return callback(new Error("CORS policy: origin requerido."));
+        if (allowNoOrigin) return originCallback(null, true);
+        return originCallback(new Error("CORS policy: origin requerido."));
       }
-      if (allowedOrigins.has(origin)) return callback(null, true);
-      return callback(new Error("CORS policy: origin no permitido."));
+      if (allowedOrigins.has(origin)) return originCallback(null, true);
+      return originCallback(new Error("CORS policy: origin no permitido."));
     },
-    methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
-    allowedHeaders: ["Content-Type", "Authorization"],
+    methods: CORS_METHODS,
+    allowedHeaders: CORS_ALLOWED_HEADERS,
     maxAge: 60 * 60
-  };
+  });
 }
 
 function isPrivilegedAdminRole(role) {
@@ -73,7 +80,7 @@ export async function createApp() {
       crossOriginResourcePolicy: { policy: "cross-origin" }
     })
   );
-  app.use(cors(buildCorsOptions()));
+  app.use("/api", cors(buildApiCorsOptions));
   app.use(express.json({ limit: env.http.bodyLimit }));
   app.use((req, res, next) => {
     res.on("finish", () => {
