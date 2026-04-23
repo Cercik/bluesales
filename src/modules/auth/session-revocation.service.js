@@ -7,10 +7,15 @@ const issuedSessions = new Map();
 const revokedPrincipals = new Map();
 const sessionNotRevokedCache = new Map();
 const principalNotRevokedCache = new Map();
-const NEGATIVE_CACHE_TTL_MS =
-  env.nodeEnv === "production"
-    ? 0
-    : 30_000;
+function parseNonNegativeNumber(value, fallback) {
+  const parsed = Number(value);
+  if (!Number.isFinite(parsed) || parsed < 0) return fallback;
+  return parsed;
+}
+const NEGATIVE_CACHE_TTL_MS = parseNonNegativeNumber(
+  process.env.SESSION_REVOCATION_NEGATIVE_CACHE_TTL_MS,
+  env.nodeEnv === "production" ? 5_000 : 30_000
+);
 
 function nowMs() {
   return Date.now();
