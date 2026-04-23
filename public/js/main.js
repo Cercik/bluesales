@@ -23,6 +23,7 @@ const state = {
 
 let saveTimer = null;
 let workerDniLookupSeq = 0;
+let workerDniLookupManualMode = false;
 
     function isAdminRole(role) {
       return role === "admin" || role === "super_admin";
@@ -1500,6 +1501,18 @@ let workerDniLookupSeq = 0;
       hint.style.color = isError ? "#9d2f25" : "";
     }
 
+    function setWorkerNameReadOnly(readOnly) {
+      const nameInput = document.getElementById("workerName");
+      if (!nameInput) return;
+      nameInput.readOnly = Boolean(readOnly);
+    }
+
+    function enableWorkerNameManualMode() {
+      workerDniLookupManualMode = true;
+      setWorkerNameReadOnly(false);
+      setWorkerNameHint("Validacion DNI no disponible. Escribe tu nombre completo manualmente.");
+    }
+
     async function lookupWorkerNameByDni(dni, options = {}) {
       const silent = Boolean(options.silent);
       const nameInput = document.getElementById("workerName");
@@ -1528,13 +1541,24 @@ let workerDniLookupSeq = 0;
         }
         if (seq !== workerDniLookupSeq) return false;
         if (!response || !response.ok) {
-          nameInput.value = "";
           const statusText = response ? ` (HTTP ${response.status})` : "";
-          const message = payload?.message || ("No se pudo consultar el DNI." + statusText);
+          const message = String(payload?.message || ("No se pudo consultar el DNI." + statusText)).trim();
+          const statusCode = Number(response?.status || 0);
+          const isServiceUnavailable = statusCode >= 500
+            || /validacion de dni no esta habilitada/i.test(message)
+            || /no se pudo conectar al servicio de validacion/i.test(message);
+          if (isServiceUnavailable) {
+            enableWorkerNameManualMode();
+            if (!silent) showToast("Validacion DNI no disponible. Ingresa tu nombre manualmente.", "info", 4500);
+            return Boolean(nameInput.value.trim());
+          }
+          nameInput.value = "";
           setWorkerNameHint(message, true);
           if (!silent) showToast(message, "error");
           return false;
         }
+        workerDniLookupManualMode = false;
+        setWorkerNameReadOnly(true);
         const nombres = String(payload?.nombres || "").trim();
         const apellidoPaterno = String(payload?.apellidoPaterno || "").trim();
         const apellidoMaterno = String(payload?.apellidoMaterno || "").trim();
@@ -1546,10 +1570,9 @@ let workerDniLookupSeq = 0;
         return Boolean(name);
       } catch (_error) {
         if (seq !== workerDniLookupSeq) return false;
-        nameInput.value = "";
-        setWorkerNameHint("No se pudo conectar para validar DNI.", true);
-        if (!silent) showToast("No se pudo conectar para validar DNI.", "error");
-        return false;
+        enableWorkerNameManualMode();
+        if (!silent) showToast("No se pudo conectar para validar DNI. Ingresa tu nombre manualmente.", "info", 4500);
+        return Boolean(nameInput.value.trim());
       }
     }
 
@@ -1589,8 +1612,8 @@ let workerDniLookupSeq = 0;
       if (state.data.users.some((u) => u.id === dni)) return showToast("Ese DNI ya esta registrado. Inicia sesion.", "error");
       if (!name) {
         const ok = await lookupWorkerNameByDni(dni);
-        if (!ok) return;
         name = nameInput.value.trim();
+        if (!ok && !name) return showToast("Ingresa tu nombre completo para continuar.", "error");
       }
 
       try {
@@ -1674,13 +1697,17 @@ let workerDniLookupSeq = 0;
       if (sanitized.length < 8) {
         workerDniLookupSeq++;
         if (nameInput) nameInput.value = "";
-        setWorkerNameHint("Ingresa tu DNI para consultar el nombre oficial.");
+        setWorkerNameHint(workerDniLookupManualMode
+          ? "Validacion DNI no disponible. Escribe tu nombre completo manualmente."
+          : "Ingresa tu DNI para consultar el nombre oficial.");
         return;
       }
+      if (workerDniLookupManualMode) return;
       lookupWorkerNameByDni(sanitized, { silent: true });
     });
     document.getElementById("workerDniRegister").addEventListener("blur", (e) => {
       const dni = String(e.target.value || "").trim();
+      if (workerDniLookupManualMode) return;
       if (dni.length === 8) lookupWorkerNameByDni(dni, { silent: true });
     });
     document.getElementById("adminLoginButton").addEventListener("click", adminLogin);
