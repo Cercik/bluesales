@@ -1499,7 +1499,15 @@ let workerDniLookupManualMode = false;
     function setWorkerNameHint(message, isError = false) {
       const hint = document.getElementById("workerNameHint");
       if (!hint) return;
-      hint.textContent = message;
+      const text = String(message || "").trim();
+      if (!text) {
+        hint.textContent = "";
+        hint.style.display = "none";
+        hint.style.color = "";
+        return;
+      }
+      hint.style.display = "";
+      hint.textContent = text;
       hint.style.color = isError ? "#9d2f25" : "";
     }
 
@@ -1568,7 +1576,7 @@ let workerDniLookupManualMode = false;
         const composedName = [nombres, apellidoPaterno, apellidoMaterno].filter(Boolean).join(" ").trim();
         const name = composedName || String(payload?.name || "").trim();
         nameInput.value = name;
-        setWorkerNameHint(name ? "Nombre validado con DNI." : "No se encontro nombre para ese DNI.", !name);
+        setWorkerNameHint(name ? "" : "No se encontro nombre para ese DNI.", !name);
         if (!name && !silent) showToast("No se encontro nombre para ese DNI.", "error");
         return Boolean(name);
       } catch (_error) {
