@@ -74,6 +74,11 @@ export async function createApp() {
   const publicDir = path.join(process.cwd(), "public");
   const legacyImagesDir = path.join(process.cwd(), "Imagenes");
 
+  // Render runs behind a proxy. Required so express-rate-limit can read client IP safely.
+  if (env.nodeEnv === "production") {
+    app.set("trust proxy", 1);
+  }
+
   app.disable("x-powered-by");
   app.use(
     helmet({
