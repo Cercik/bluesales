@@ -331,6 +331,10 @@ async function addOrderNotifications(state, order) {
         notification.sent = false;
         notification.error = String(delivery?.error || "No se pudo enviar WhatsApp.");
       }
+    } else {
+      notification.error = env.whatsapp.enabled
+        ? "Envio automatico de WhatsApp deshabilitado."
+        : "Integracion WhatsApp no configurada.";
     }
   }
 
@@ -347,6 +351,174 @@ async function addOrderNotifications(state, order) {
     });
   }
 }
+
+function getIsoWeekNumber(reference = new Date()) {
+  const d = new Date(Date.UTC(reference.getFullYear(), reference.getMonth(), reference.getDate()));
+  const day = d.getUTCDay() || 7;
+  d.setUTCDate(d.getUTCDate() + 4 - day);
+  const yearStart = new Date(Date.UTC(d.getUTCFullYear(), 0, 1));
+  return Math.ceil((((d - yearStart) / 86400000) + 1) / 7);
+}
+
+function getCycleWeekNumber(cycleKey) {
+  const start = getCycleDateFromKey(cycleKey);
+  if (!start) return 0;
+  const end = new Date(start);
+  end.setDate(start.getDate() + 5);
+  end.setHours(23, 59, 59, 999);
+  return getIsoWeekNumber(end);
+}
+
+function getPublishedPriceUpdates(previousState, nextState) {
+  const previousWeeklyPrices = previousState?.settings?.weeklyPrices && typeof previousState.settings.weeklyPrices === "object"
+    ? previousState.settings.weeklyPrices
+    : {};
+  const nextWeeklyPrices = nextState?.settings?.weeklyPrices && typeof nextState.settings.weeklyPrices === "object"
+    ? nextState.settings.weeklyPrices
+    : {};
+  const keys = new Set([...Object.keys(previousWeeklyPrices), ...Object.keys(nextWeeklyPrices)]);
+  const updates = [];
+
+  keys.forEach((cycleKey) => {
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(String(cycleKey || ""))) return;
+    const previousEntry = previousWeeklyPrices[cycleKey] && typeof previousWeeklyPrices[cycleKey] === "object"
+      ? previousWeeklyPrices[cycleKey]
+      : {};
+    const nextEntry = nextWeeklyPrices[cycleKey] && typeof nextWeeklyPrices[cycleKey] === "object"
+      ? nextWeeklyPrices[cycleKey]
+      : {};
+
+    const previousPrice = toNumber(previousEntry.pricePerKg);
+    const nextPrice = toNumber(nextEntry.pricePerKg);
+    const wasPublished = Boolean(previousEntry.published) && previousPrice > 0;
+    const isPublished = Boolean(nextEntry.published) && nextPrice > 0;
+    if (!isPublished) return;
+
+    const becamePublished = !wasPublished;
+    const priceChanged = wasPublished && Math.abs(previousPrice - nextPrice) > 0.0001;
+    if (!becamePublished && !priceChanged) return;
+
+    updates.push({
+      cycleKey: String(cycleKey),
+      pricePerKg: nextPrice
+    });
+  });
+
+  return updates;
+}
+
+function buildPublishedPriceWhatsappMessage({ actorUsername, weekNumber, pricePerKg }) {
+  const safeActor = String(actorUsername || "admin");
+  const safeWeek = String(weekNumber || "-");
+  const safePrice = Number(pricePerKg || 0).toFixed(2);
+  return `usuario "${safeActor}" el precio para la semana "${safeWeek}" ha sido actualizado a S/"${safePrice}", por favor confirmar su compra.`;
+}
+
+async function addPublishedPriceNotifications({ previousState, nextState, actorProfile }) {
+  const updates = getPublishedPriceUpdates(previousState, nextState);
+  if (!updates.length) {
+    return {
+      created: 0,
+      attempted: 0,
+      sent: 0,
+      failed: 0,
+      skippedNoPhone: 0,
+      skippedAutoSendDisabled: 0
+    };
+  }
+
+  if (!Array.isArray(nextState.notifications)) nextState.notifications = [];
+  const users = Array.isArray(nextState.users) ? nextState.users : [];
+  const orders = Array.isArray(nextState.orders) ? nextState.orders : [];
+  const usersById = new Map(users.map((row) => [String(row?.id || ""), row]));
+  const actorUsername = String(actorProfile?.username || actorProfile?.id || "admin");
+
+  const summary = {
+    created: 0,
+    attempted: 0,
+    sent: 0,
+    failed: 0,
+    skippedNoPhone: 0,
+    skippedAutoSendDisabled: 0
+  };
+  for (const update of updates) {
+    const weekNumber = getCycleWeekNumber(update.cycleKey);
+    const message = buildPublishedPriceWhatsappMessage({
+      actorUsername,
+      weekNumber,
+      pricePerKg: update.pricePerKg
+    });
+    const notifiedWorkerIds = new Set();
+
+    for (const order of orders) {
+      const orderCycleKey = getOrderCycleKey(order);
+      if (orderCycleKey !== update.cycleKey) continue;
+      if (!["pending_confirm", "price_published"].includes(String(order?.status || ""))) continue;
+
+      const workerId = String(order?.workerId || "");
+      if (!workerId || notifiedWorkerIds.has(workerId)) continue;
+      notifiedWorkerIds.add(workerId);
+
+      const worker = usersById.get(workerId);
+      if (worker?.active === false) continue;
+
+      const target = String(worker?.phone || order?.workerPhone || "").trim();
+      if (!target) {
+        summary.skippedNoPhone += 1;
+        continue;
+      }
+
+      const notification = {
+        id: uid("ntf"),
+        workerId,
+        workerName: String(order?.workerName || worker?.name || workerId),
+        channel: "WhatsApp",
+        target,
+        message,
+        sent: false,
+        createdAt: new Date().toISOString(),
+        context: "price_publication",
+        cycleKey: update.cycleKey,
+        weekNumber,
+        pricePerKg: Number(update.pricePerKg.toFixed(2))
+      };
+      nextState.notifications.unshift(notification);
+      summary.created += 1;
+
+      if (env.whatsapp.enabled && env.whatsapp.autoSendOrderNotifications) {
+        summary.attempted += 1;
+        const delivery = await sendWhatsappTextMessage({
+          phone: notification.target,
+          message: notification.message
+        });
+        notification.provider = "APISPERU";
+        notification.providerStatus = Number(delivery?.status || 0);
+        notification.providerCode = String(delivery?.code || "");
+        notification.providerMessage = String(delivery?.providerMessage || delivery?.error || "");
+        notification.providerMessageId = String(delivery?.messageId || "");
+        notification.providerTarget = String(delivery?.target || notification.target);
+        notification.lastAttemptAt = new Date().toISOString();
+        if (delivery?.ok) {
+          notification.sent = true;
+          notification.sentAt = notification.lastAttemptAt;
+          summary.sent += 1;
+        } else {
+          notification.sent = false;
+          notification.error = String(delivery?.error || "No se pudo enviar WhatsApp.");
+          summary.failed += 1;
+        }
+      } else {
+        notification.error = env.whatsapp.enabled
+          ? "Envio automatico de WhatsApp deshabilitado."
+          : "Integracion WhatsApp no configurada.";
+        summary.skippedAutoSendDisabled += 1;
+      }
+    }
+  }
+
+  return summary;
+}
+
 async function mergeUsersWithCredentials(nextUsers, currentUsers) {
   const currentById = new Map(
     (Array.isArray(currentUsers) ? currentUsers : []).map((worker) => [String(worker?.id || ""), worker])
@@ -999,6 +1171,16 @@ router.put("/state", async (req, res, next) => {
 
     const currentState = await safeGetState();
     const mergedState = await mergeIncomingStateWithCredentials(sanitizedData, currentState);
+    const priceNotificationSummary = await addPublishedPriceNotifications({
+      previousState: currentState,
+      nextState: mergedState,
+      actorProfile: profile
+    });
+    const priceNotificationsCreated = Number(priceNotificationSummary?.created || 0);
+    const priceNotificationsSent = Number(priceNotificationSummary?.sent || 0);
+    const priceNotificationsFailed = Number(priceNotificationSummary?.failed || 0);
+    const priceNotificationsSkippedNoPhone = Number(priceNotificationSummary?.skippedNoPhone || 0);
+    const priceNotificationsSkippedAutoSendDisabled = Number(priceNotificationSummary?.skippedAutoSendDisabled || 0);
     const persisted = await safePersistState(mergedState);
     logSecurityEvent("transition_endpoint_used", req, {
       endpoint: "/api/state",
@@ -1011,12 +1193,22 @@ router.put("/state", async (req, res, next) => {
       actorId: profile.id,
       persisted,
       usersCount: Array.isArray(mergedState.users) ? mergedState.users.length : 0,
-      ordersCount: Array.isArray(mergedState.orders) ? mergedState.orders.length : 0
+      ordersCount: Array.isArray(mergedState.orders) ? mergedState.orders.length : 0,
+      priceNotificationsCreated,
+      priceNotificationsSent,
+      priceNotificationsFailed,
+      priceNotificationsSkippedNoPhone,
+      priceNotificationsSkippedAutoSendDisabled
     });
     return res.json({
       ok: true,
       persisted,
       storage: persisted ? "firestore" : "memory",
+      priceNotificationsCreated,
+      priceNotificationsSent,
+      priceNotificationsFailed,
+      priceNotificationsSkippedNoPhone,
+      priceNotificationsSkippedAutoSendDisabled,
       message: persisted
         ? "State persisted to Firestore."
         : "Firebase is not configured. State saved only in memory.",

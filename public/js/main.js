@@ -346,7 +346,14 @@ let workerDniLookupManualMode = false;
       const response = await fetch(`${API_BASE}/state`, {
         headers: state.session?.token ? { Authorization: "Bearer " + state.session.token } : {}
       });
-      if (response.status === 401) return null;
+      if (response.status === 401) {
+        const hadSession = Boolean(state.session?.token);
+        saveSession(null);
+        if (hadSession) {
+          showToast("La sesion expiro. Inicia sesion nuevamente.", "error");
+        }
+        return null;
+      }
       if (!response.ok) throw new Error(`HTTP ${response.status}`);
       const payload = await response.json();
       if (payload?.data && payload.data.settings && payload.data.orders && payload.data.notices) {
@@ -366,6 +373,19 @@ let workerDniLookupManualMode = false;
           });
           if (!response.ok) throw new Error(`HTTP ${response.status}`);
           const payload = await response.json().catch(() => ({}));
+          const priceNotificationsCreated = Number(payload?.priceNotificationsCreated || 0);
+          if (priceNotificationsCreated > 0) {
+            const priceNotificationsSent = Number(payload?.priceNotificationsSent || 0);
+            if (priceNotificationsSent > 0) {
+              showToast(`${priceNotificationsSent}/${priceNotificationsCreated} mensajes de WhatsApp enviados por publicacion de precio.`, "success");
+            } else {
+              showToast(
+                `Se generaron ${priceNotificationsCreated} notificaciones de precio, pero no se enviaron automaticamente. Revisa configuracion de WhatsApp.`,
+                "info",
+                5200
+              );
+            }
+          }
           if (payload?.storage === "memory" && !state.warnedMemoryStorage) {
             state.warnedMemoryStorage = true;
             showToast("Firebase no está configurado. Los cambios se guardan solo en memoria.", "error", 4200);
